@@ -1,1 +1,22 @@
 /* style.css */
+body {
+  text-align:center;
+  font-family:"Open Sans";
+  color:#404040;
+}
+#game-wrapper {
+  text-align:center;
+  padding:15px 20px;
+  width:70%;
+  height:70%;
+  margin-left:auto;
+  margin-right:auto;
+}
+#game-canvas {
+  border:2px solid #ff0000;
+  width:100%;
+}
+#game-info {
+  margin-top:10px;
+  text-align:left;
+}
