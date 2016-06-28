@@ -1,0 +1,8 @@
+{
+  "name": "multiplayer-snake",
+  "version": "0.0.1",
+  "description": "A snake game that supports many players.",
+  "dependencies": {
+    "express": "^4.10.2"
+  }
+}
