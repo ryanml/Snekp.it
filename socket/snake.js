@@ -1,48 +1,70 @@
-module.exports = class SnakeLogic {
-  // Creates blank game state object
+module.exports = class SnakeActions {
   constructor() {
+    // Game state object contains players, and coordinates of food as attributes.
     this.gameState = {
       players: [],
       foodCoords: []
     }
-    this.gridWidth = 895;
-    this.gridHeight = 495;
+    // Constant values for grid and block size
+    this.gridWidth = 1050;
+    this.gridHeight = 750;
+    this.blockSize = 30;
+    // Function generates a random block coordinate within grid bounds
+    this.genRandomCoord = (limit) => {
+      return Math.floor(
+        Math.ceil(
+          (Math.random() * limit) / this.blockSize
+        ) * this.blockSize
+      );
+    };
   }
+  // Updates food coordinates
   addNewFood() {
-      var x = Math.floor(Math.random() * this.gridWidth);
-      var y = Math.floor(Math.random() * this.gridHeight);
+      var x = this.genRandomCoord(this.gridWidth);
+      var y = this.genRandomCoord(this.gridHeight);
       this.gameState.foodCoords = [x, y];
-    }
-    // Pushes starting coordinates for new player to gamestat
+  }
+  // Pushes a new player object to gamestate
   addPlayer(id) {
-    var x = Math.floor(Math.random() * this.gridWidth);
-    var y = Math.floor(Math.random() * this.gridHeight);
+    var x = this.genRandomCoord(this.gridWidth);
+    var y = this.genRandomCoord(this.gridHeight);
     this.gameState.players.push({
       id: id,
-      coords: [x, y]
+      coords: [x, y],
+      direction: false
     });
   }
+  // Removes player object from gamestate
   removePlayer(id) {
     var players = this.gameState.players;
     this.gameState.players = players.filter(p => p.id !== id);
   }
-  updatePlayerPos(action, id) {
+  // Updates the direction attribute for a player object
+  updatePlayerDirection(id, action) {
+    var players = this.gameState.players;
+    this.gameState.players = players.map(p => {
+      if (p.id == id) {
+        p.direction = action;
+      }
+      return p;
+    });
+  }
+  // Given each player object's direction, updates coordinates appropriately
+  updatePlayerCoords() {
     this.gameState.players.map(p => {
-      if (p.id === id) {
-        switch (action) {
-          case 'UP':
-            p.coords[1] -= 3;
-            break;
-          case 'DOWN':
-            p.coords[1] += 3;
-            break;
-          case 'LEFT':
-            p.coords[0] -= 3;
-            break;
-          case 'RIGHT':
-            p.coords[0] += 3;
-            break;
-        }
+      switch (p.direction) {
+        case 'UP':
+          p.coords[1] -= 30;
+          break;
+        case 'DOWN':
+          p.coords[1] += 30;
+          break;
+        case 'LEFT':
+          p.coords[0] -= 30;
+          break;
+        case 'RIGHT':
+          p.coords[0] += 30;
+          break;
       }
       return p;
     });

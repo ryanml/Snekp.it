@@ -2,27 +2,35 @@ exports.socket = function(http) {
   // Require socket.io
   var io = require('socket.io')(http);
   // Require snake.js
-  var SnakeLogic = require('./snake');
-  var snake = new SnakeLogic();
+  var SnakeActions = require('./snake');
+  var snake = new SnakeActions();
+  var updateLoop;
   // Socket logic
   io.on('connection', function(socket) {
+    // Id associate with client connection
+    var id = socket.id;
     // Add new player on connection
-    snake.addPlayer(socket.id);
-    io.emit('state-change', snake.gameState);
-    // Draw initial food if it isn't there yet
+    snake.addPlayer(id);
+    // To avoid double interval, clear loop on reload
+    if (updateLoop) {
+      clearInterval(updateLoop);
+    }
+    // Every 100ms, update player coordinates and push state change to client
+    updateLoop = setInterval(function() {
+      snake.updatePlayerCoords();
+      io.emit('state-change', snake.gameState);
+    }, 100);
+    // Draw food if it doesn't exist
     if (snake.gameState.foodCoords.length === 0) {
       snake.addNewFood();
-      io.emit('state-change', snake.gameState);
     }
-    // When a player moves, update position
+    // When a player moves, change player direction
     socket.on('player-movement', function(action) {
-      snake.updatePlayerPos(action, socket.id);
-      io.emit('state-change', snake.gameState);
+      snake.updatePlayerDirection(id, action);
     });
     // When a player disconnects, remove their dot
     socket.on('disconnect', function() {
-      snake.removePlayer(socket.id);
-      io.emit('state-change', snake.gameState);
+      snake.removePlayer(id);
     })
 
   });

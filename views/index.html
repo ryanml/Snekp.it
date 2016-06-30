@@ -3,7 +3,8 @@
   <head>
     <title>Snake</title>
     <meta charset="utf-8"></meta>
-    <script src="../js/snake.js"></script>
+    <script src="../socket.io/socket.io.js"></script>
+    <script src="../js/canvas.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/style.css">
   </head>
   <body>
@@ -11,9 +12,9 @@
 `     <h2>Snake</h2>
     </header>
     <div id="game-wrapper">
-      <canvas id="game-canvas"></canvas>
+      <canvas width="1050" height="750" id="game-canvas"></canvas>
       <div id="game-info">
-        <span id="score">Score:</span>
+        <span id="score"></span>
       </div>
     </div>
   </body>
