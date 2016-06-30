@@ -1,9 +1,10 @@
 module.exports = class SnakeActions {
   constructor() {
-    // Game state object contains players, and coordinates of food as attributes.
+    // Game state object contains players, coordinates of food, and high score as attributes.
     this.gameState = {
       players: [],
-      foodCoords: []
+      foodCoords: [],
+      highScore: 0
     }
     // Constant values for grid and block size
     this.gridWidth = 1050;
@@ -13,16 +14,16 @@ module.exports = class SnakeActions {
     this.genRandomCoord = (limit) => {
       return Math.floor(
         Math.ceil(
-          (Math.random() * limit) / this.blockSize
+          (Math.random() * (limit - this.blockSize)) / this.blockSize
         ) * this.blockSize
       );
     };
-  }
-  // Updates food coordinates
-  addNewFood() {
+    // Adds new food
+    this.addFood = () => {
       var x = this.genRandomCoord(this.gridWidth);
       var y = this.genRandomCoord(this.gridHeight);
       this.gameState.foodCoords = [x, y];
+    };
   }
   // Pushes a new player object to gamestate
   addPlayer(id) {
@@ -31,6 +32,7 @@ module.exports = class SnakeActions {
     this.gameState.players.push({
       id: id,
       coords: [x, y],
+      score: 0,
       direction: false
     });
   }
@@ -50,7 +52,10 @@ module.exports = class SnakeActions {
     });
   }
   // Given each player object's direction, updates coordinates appropriately
-  updatePlayerCoords() {
+  updateGame() {
+    var foodCoords = this.gameState.foodCoords;
+    var consumed = false;
+    var collision = false;
     this.gameState.players.map(p => {
       switch (p.direction) {
         case 'UP':
@@ -68,5 +73,17 @@ module.exports = class SnakeActions {
       }
       return p;
     });
+    this.gameState.players.map(p => {
+      if (p.coords[0] === foodCoords[0] &&
+          p.coords[1] === foodCoords[1]) {
+        // Increment score, set consumed to true
+        p.score += 1;
+        consumed = true;
+      }
+      return p;
+    });
+    if (consumed) {
+      this.addFood();
+    }
   }
 }

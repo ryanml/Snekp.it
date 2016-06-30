@@ -7,14 +7,13 @@ body {
 #game-wrapper {
   text-align:center;
   padding:15px 20px;
-  width:70%;
-  height:70%;
+  width:1050px;
+  height:750px;
   margin-left:auto;
   margin-right:auto;
 }
 #game-canvas {
   border:2px solid #ff0000;
-  width:100%;
 }
 #game-info {
   margin-top:10px;
