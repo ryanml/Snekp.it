@@ -4,8 +4,9 @@ module.exports = class SnakeActions {
     this.gameState = {
         players: [],
         foodCoords: [],
-        highScore: 0
-      }
+        highScore: 0,
+        numPlayers: 0
+    }
     // Constant values for grid and block size
     this.gridWidth = 1050;
     this.gridHeight = 750;
@@ -27,10 +28,12 @@ module.exports = class SnakeActions {
       score: 0,
       direction: false
     });
+    this.gameState.numPlayers = this.gameState.players.length;
   }
   removePlayer(id) {
     var players = this.gameState.players;
     this.gameState.players = players.filter(p => p.id !== id);
+    this.gameState.numPlayers = this.gameState.players.length;
   }
   addFood() {
     var x = this.genRandomCoord(this.gridWidth);
@@ -89,7 +92,11 @@ module.exports = class SnakeActions {
       if (p.coords[0] === foodCoords[0] &&
         p.coords[1] === foodCoords[1]) {
         // Increment score, set consumed to true
-        p.score += 1;
+        p.score++;
+        // Update high score
+        if (p.score > this.gameState.highScore) {
+          this.gameState.highScore = p.score;
+        }
         consumed = true;
       }
       return p;

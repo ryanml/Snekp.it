@@ -2,18 +2,20 @@ window.onload = function() {
   class GameHandler {
     constructor(id) {
       this.id = id;
-      this.score = 0;
       this.boxWidth = 30;
       this.boxHeight = 30;
       this.canvas = document.getElementById('game-canvas');
       this.context = this.canvas.getContext('2d');
       this.scoreSpan = document.getElementById('score');
+      this.highScoreSpan = document.getElementById('high-score');
+      this.playerSpan = document.getElementById('num-players');
       document.body.addEventListener('keydown', this.sendAction);
     }
-    putScore(gameState) {
+    putStats(gameState) {
       var player = gameState.players.filter(p => p.id === this.id);
-      this.score = player[0].score;
-      this.scoreSpan.innerHTML = this.score;
+      this.scoreSpan.innerHTML = player[0].score;
+      this.highScoreSpan.innerHTML = gameState.highScore;
+      this.playerSpan.innerHTML = gameState.numPlayers;
     }
     checkLife(gameState) {
       var player = gameState.players.filter(p => p.id === this.id);
@@ -64,7 +66,7 @@ window.onload = function() {
   });
   socket.on('state-change', function(newState) {
     if (gameHandler.checkLife(newState)) {
-      gameHandler.putScore(newState);
+      gameHandler.putStats(newState);
       gameHandler.drawState(newState);
     }
     else {
