@@ -18,3 +18,12 @@ body {
 #game-info {
   margin-top:10px;
 }
+#death-prompt {
+  margin:20px;
+  display:none;
+  font-size:175%;
+}
+#death-text {
+  color:#ff0000;
+  font-weight:bold;
+}

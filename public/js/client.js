@@ -9,7 +9,10 @@ window.onload = function() {
       this.scoreSpan = document.getElementById('score');
       this.highScoreSpan = document.getElementById('high-score');
       this.playerSpan = document.getElementById('num-players');
+      this.deathPrompt = document.getElementById('death-prompt');
+      this.replayButton = document.getElementById('replay');
       document.body.addEventListener('keydown', this.sendAction);
+      this.replayButton.addEventListener('click', this.reloadPage);
     }
     putStats(gameState) {
       var player = gameState.players.filter(p => p.id === this.id);
@@ -20,6 +23,20 @@ window.onload = function() {
     checkLife(gameState) {
       var player = gameState.players.filter(p => p.id === this.id);
       return player.length === 0 ? false : true;
+    }
+    drawState(gameState) {
+      // Clear old state
+      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      // Draw food
+      this.context.fillStyle = '#ff0000';
+      var food = gameState.foodCoords;
+      this.context.fillRect(food[0], food[1], this.boxWidth, this.boxHeight);
+      // Draw players
+      this.context.fillStyle = '#0000ff';
+      var players = gameState.players;
+      for (var p = 0; p < players.length; p++) {
+        this.context.fillRect(players[p].coords[0], players[p].coords[1], this.boxWidth, this.boxHeight);
+      }
     }
     sendAction(e) {
       var key = e.keyCode;
@@ -40,19 +57,8 @@ window.onload = function() {
       }
       socket.emit('player-movement', action);
     }
-    drawState(gameState) {
-      // Clear old state
-      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      // Draw food
-      this.context.fillStyle = '#ff0000';
-      var food = gameState.foodCoords;
-      this.context.fillRect(food[0], food[1], this.boxWidth, this.boxHeight);
-      // Draw players
-      this.context.fillStyle = '#0000ff';
-      var players = gameState.players;
-      for (var p = 0; p < players.length; p++) {
-        this.context.fillRect(players[p].coords[0], players[p].coords[1], this.boxWidth, this.boxHeight);
-      }
+    reloadPage(e) {
+      location.reload();
     }
   }
   var clientId;
@@ -67,10 +73,10 @@ window.onload = function() {
   socket.on('state-change', function(newState) {
     if (gameHandler.checkLife(newState)) {
       gameHandler.putStats(newState);
-      gameHandler.drawState(newState);
     }
     else {
-      alert('You have died. Reload to replay');
+      gameHandler.deathPrompt.style.display = 'block';
     }
+    gameHandler.drawState(newState);
   });
 }
