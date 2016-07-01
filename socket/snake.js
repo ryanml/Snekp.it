@@ -72,8 +72,10 @@ module.exports = class SnakeActions {
     this.gameState.players.map(p => {
       var x = p.coords[0];
       var y = p.coords[1];
-      if ((x > this.gridWidth || x < 0) ||
-        y > this.gridHeight || y < 0) {
+      var horBounds = (this.gridWidth - this.blockSize);
+      var verBounds = (this.gridHeight - this.blockSize);
+      if ((x > horBounds || x < 0) ||
+        y > verBounds || y < 0) {
         casualties.push(p.id);
       }
       return p;
