@@ -7,9 +7,11 @@ exports.socket = function(http) {
   var updateLoop;
   // Socket logic
   io.on('connection', function(socket) {
-    // Id associate with client connection
+    // id associate with client connection
     var id = socket.id;
-    // Add food if it isn't there
+    // Send id to the client
+    io.emit('client-id', id);
+    // Add initial food
     if (snake.gameState.foodCoords.length === 0) {
       snake.addFood();
     }
@@ -21,8 +23,8 @@ exports.socket = function(http) {
     }
     // Every 100ms, update player coordinates and push state change to client
     updateLoop = setInterval(function() {
-      snake.updateGame();
-      io.emit('state-change', snake.gameState);
+      snake.updatePositions();
+      io.emit('state-change', snake.gameState, id);
     }, 100);
     // When a player moves, change player direction
     socket.on('player-movement', function(action) {

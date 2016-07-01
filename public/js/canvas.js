@@ -1,5 +1,22 @@
 // Snake handler class
 window.onload = function() {
+class GameHandler {
+  // Constructor takes client id
+  constructor(id) {
+    this.id = id;
+    this.alive = true;
+    this.score = 0;
+  }
+  getScore() {
+    var player = gameState.players.filter(p => p.id === this.id);
+    this.score = player[0].score;
+    return this.score;
+  }
+  checkLife(gameState) {
+    var player = gameState.players.filter(p => p.id === this.id);
+    return player.length === 0 ? false : true;
+  }
+}
 class CanvasHandler {
     constructor() {
       this.canvas = document.getElementById('game-canvas');
@@ -22,7 +39,9 @@ class CanvasHandler {
       }
     }
 }
-// New socket, canvasHandler, keyHandler objects
+// New socket, canvasHandler objects
+var clientId;
+var gameHandler;
 var socket = io();
 var canvasHandler = new CanvasHandler();
 document.body.onkeydown = function(e) {
@@ -45,8 +64,20 @@ document.body.onkeydown = function(e) {
   // Send action to socket
   socket.emit('player-movement', action);
 }
+socket.on('client-id', function(id) {
+  // Set clientId if it isn't already set
+  if (!clientId) {
+    clientId = id;
+    gameHandler = new GameHandler(clientId);
+  }
+});
 // Check for state changes, update state
 socket.on('state-change', function(newState) {
-  canvasHandler.drawState(newState);
+  if (gameHandler.checkLife(newState)) {
+    canvasHandler.drawState(newState);
+  }
+  else {
+    alert('You have died. Reload to replay');
+  }
 });
 }
