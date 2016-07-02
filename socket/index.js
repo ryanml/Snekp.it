@@ -1,3 +1,4 @@
+'use strict';
 exports.socket = function(http) {
   // Require socket.io
   var io = require('socket.io')(http);

@@ -1,3 +1,4 @@
+'use strict';
 window.onload = function() {
   class GameHandler {
     constructor(id) {
@@ -32,9 +33,9 @@ window.onload = function() {
       var food = gameState.foodCoords;
       this.context.fillRect(food[0], food[1], this.boxWidth, this.boxHeight);
       // Draw players
-      this.context.fillStyle = '#0000ff';
       var players = gameState.players;
       for (var p = 0; p < players.length; p++) {
+        this.context.fillStyle = players[p].color;
         this.context.fillRect(players[p].coords[0], players[p].coords[1], this.boxWidth, this.boxHeight);
       }
     }

@@ -1,3 +1,4 @@
+'use strict';
 module.exports = class SnakeActions {
   constructor() {
     // Game state object contains players, coordinates of food, and high score as attributes.
@@ -26,9 +27,27 @@ module.exports = class SnakeActions {
       id: id,
       coords: [x, y],
       score: 0,
-      direction: false
+      direction: false,
+      color: this.genRandomColor()
     });
     this.gameState.numPlayers = this.gameState.players.length;
+  }
+  genRandomColor() {
+    var chars = 'ABCDEF0123456789';
+    var unique = false;
+    var hex;
+    while (!unique) {
+      hex = '#';
+      for (var c = 0; c < 6; c++) {
+        hex += chars[Math.floor(Math.random() * chars.length)];
+      }
+      // Check if color already exists among players
+      var colorPlayer = this.gameState.players.filter(p => p.color === hex);
+      if (colorPlayer.length === 0) {
+        unique = true
+      }
+    }
+    return hex;
   }
   removePlayer(id) {
     var players = this.gameState.players;
