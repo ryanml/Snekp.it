@@ -7,8 +7,8 @@ body {
 #game-wrapper {
   text-align:center;
   padding:15px 20px;
-  width:1050px;
-  height:750px;
+  width:1080px;
+  height:510px;
   margin-left:auto;
   margin-right:auto;
 }
@@ -19,9 +19,10 @@ body {
   margin-top:10px;
 }
 #death-prompt {
-  margin:20px;
+  height:50px;
+}
+#death-info {
   display:none;
-  font-size:175%;
 }
 #death-text {
   color:#ff0000;

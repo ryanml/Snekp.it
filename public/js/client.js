@@ -3,8 +3,7 @@ window.onload = function() {
     class GameHandler {
         constructor(id) {
             this.id = id;
-            this.boxWidth = 30;
-            this.boxHeight = 30;
+            this.blockSize = 15;
             this.domActions();
         }
         checkLife(gameState) {
@@ -28,8 +27,10 @@ window.onload = function() {
             var players = gameState.players;
             for (var p = 0; p < players.length; p++) {
                 this.context.fillStyle = players[p].color;
-                this.context.fillRect(players[p].coords[0], players[p].coords[1], this.boxWidth, this.boxHeight);
-            }
+                for (var b = 0; b < players[p].blocks.length; b++) {
+                  var blocks = players[p].blocks;
+                  this.context.fillRect(blocks[b][0], blocks[b][1], this.blockSize, this.blockSize);  
+                }            }
         }
         sendAction(e) {
             var key = e.keyCode;
@@ -52,13 +53,13 @@ window.onload = function() {
         }
         domActions() {
             this.foodImage = document.createElement('img');
-            this.foodImage.src = '/img/food.jpg';
+            this.foodImage.src = '/img/food.gif';
             this.canvas = document.getElementById('game-canvas');
             this.context = this.canvas.getContext('2d');
             this.scoreSpan = document.getElementById('score');
             this.highScoreSpan = document.getElementById('high-score');
             this.playerSpan = document.getElementById('num-players');
-            this.deathPrompt = document.getElementById('death-prompt');
+            this.deathPrompt = document.getElementById('death-info');
             this.replayButton = document.getElementById('replay');
             this.replayButton.addEventListener('click', this.reloadPage);
             document.body.addEventListener('keydown', this.sendAction);

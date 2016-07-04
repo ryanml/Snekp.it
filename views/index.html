@@ -8,11 +8,14 @@
     <link rel="stylesheet" type="text/css" href="../css/style.css">
   </head>
   <body>
-    <header>
-`     <h2>Snake</h2>
-    </header>
+    <div id="death-prompt">
+      <div id="death-info">
+        <span id="death-text">You have died.</span>
+        <button id="replay" type="button">Replay?</button>
+      </div>
+    </div>
     <div id="game-wrapper">
-      <canvas width="1050" height="750" id="game-canvas"></canvas>
+      <canvas width="1080" height="540" id="game-canvas"></canvas>
       <div id="game-info">
         <div style="float:left;width;33%">
           <span>Your Score: <span id="score"></span></span>
@@ -23,10 +26,6 @@
         <div style="float:right;width:33%">
           <span>No. Players:  <span id="num-players"></span></span>
         </div>
-      </div>
-      <div id="death-prompt">
-        <span id="death-text">You have died.</span>
-        <button id="replay" type="button">Replay?</button>
       </div>
     </div>
   </body>

@@ -9,9 +9,9 @@ module.exports = class SnakeActions {
         numPlayers: 0
     }
     // Constant values for grid and block size
-    this.gridWidth = 1050;
-    this.gridHeight = 750;
-    this.blockSize = 30;
+    this.gridWidth = 1080;
+    this.gridHeight = 540;
+    this.blockSize = 15;
   }
   genRandomCoord(limit) {
     return Math.floor(
@@ -25,7 +25,7 @@ module.exports = class SnakeActions {
     var y = this.genRandomCoord(this.gridHeight);
     this.gameState.players.push({
       id: id,
-      coords: [x, y],
+      blocks: [[x, y]],
       score: 0,
       direction: false,
       color: this.genRandomColor()
@@ -72,16 +72,16 @@ module.exports = class SnakeActions {
     this.gameState.players.map(p => {
       switch (p.direction) {
         case 'UP':
-          p.coords[1] -= this.blockSize;
+          p.blocks[0][1] -= this.blockSize;
           break;
         case 'DOWN':
-          p.coords[1] += this.blockSize;
+          p.blocks[0][1] += this.blockSize;
           break;
         case 'LEFT':
-          p.coords[0] -= this.blockSize;
+          p.blocks[0][0] -= this.blockSize;
           break;
         case 'RIGHT':
-          p.coords[0] += this.blockSize;
+          p.blocks[0][0] += this.blockSize;
           break;
       }
       return p;
@@ -92,8 +92,8 @@ module.exports = class SnakeActions {
   checkBounds() {
     var casualties = [];
     this.gameState.players.map(p => {
-      var x = p.coords[0];
-      var y = p.coords[1];
+      var x = p.blocks[0][0];
+      var y = p.blocks[0][1];
       var horBounds = (this.gridWidth - this.blockSize);
       var verBounds = (this.gridHeight - this.blockSize);
       if ((x > horBounds || x < 0) ||
@@ -108,8 +108,8 @@ module.exports = class SnakeActions {
     var foodCoords = this.gameState.foodCoords;
     var consumed = false;
     this.gameState.players.map(p => {
-      if (p.coords[0] === foodCoords[0] &&
-        p.coords[1] === foodCoords[1]) {
+      if (p.blocks[0][0] === foodCoords[0] &&
+        p.blocks[0][1] === foodCoords[1]) {
         // Increment score, set consumed to true
         p.score++;
         // Update high score
