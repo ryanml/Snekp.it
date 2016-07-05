@@ -7,8 +7,8 @@ module.exports = class SnakeActions {
         foodCoords: [],
         highScore: 0,
         numPlayers: 0
-    }
-    // Constant values for grid and block size
+      }
+      // Constant values for grid and block size
     this.gridWidth = 1080;
     this.gridHeight = 540;
     this.blockSize = 15;
@@ -30,15 +30,15 @@ module.exports = class SnakeActions {
   }
   removePlayer(id, killed) {
     var players = this.gameState.players;
-    var deadPlayer = this.gameState.players.filter(p => p.id === id);
+    var deadPlayer = players.filter(p => p.id === id)[0];
     this.gameState.players = players.filter(p => p.id !== id);
     this.gameState.numPlayers = this.gameState.players.length;
     // If the player was killed, add food in their wake
     if (killed) {
       // For every other block, add food at that coordinate
-      for (var b = 0; b < deadPlayer.blocks.length; b += 2) {
+      for (var b = 1; b < deadPlayer.blocks.length; b += 2) {
         var block = deadPlayer.blocks[b];
-        this.gameState.foodCoords.push(block[0], block[1]);
+        this.gameState.foodCoords.push([block[0], block[1]]);
       }
     }
   }
@@ -136,23 +136,35 @@ module.exports = class SnakeActions {
       // Check if the player has hit a wall
       if ((x > horBounds || x < 0) ||
         y > verBounds || y < 0) {
-        casualties.push({id: p.id, killed: false});
+        casualties.push({
+          id: p.id,
+          killed: true
+        });
         return p;
       }
-      // Check if a player has collided with themselves
-      for (var b = 1; b < p.blocks.length; b++) {
-        if (x === p.blocks[b][0] && y === p.blocks[b][1]) {
-          casualties.push({id: p.id, killed: false});
-          return p;
+      // Players with a one block length are exempt from these conditions
+      if (p.score > 0) {
+        // Check if a player has collided with themselves
+        for (var b = 1; b < p.blocks.length; b++) {
+          if (x === p.blocks[b][0] && y === p.blocks[b][1]) {
+            casualties.push({
+              id: p.id,
+              killed: false
+            });
+            return p;
+          }
         }
-      }
-      // Check if a player has collided with another player
-      for (var l = 0; l < players.length; l++) {
-        if (players[l].id !== p.id) {
-          for (var o = 0; o < players[l].blocks.length; o++) {
-            if (x === players[l].blocks[o][0] && y === players[l].blocks[o][1]) {
-              casualties.push({id: p.id, killed: true});
-              return p;
+        // Check if a player has collided with another player
+        for (var l = 0; l < players.length; l++) {
+          if (players[l].id !== p.id) {
+            for (var o = 0; o < players[l].blocks.length; o++) {
+              if (x === players[l].blocks[o][0] && y === players[l].blocks[o][1]) {
+                casualties.push({
+                  id: p.id,
+                  killed: true
+                });
+                return p;
+              }
             }
           }
         }
@@ -183,14 +195,15 @@ module.exports = class SnakeActions {
             this.gameState.highScore = p.score;
           }
           consumed = true;
-        } else {
-          tail = p.blocks.pop();
-          tail[0] = x;
-          tail[1] = y;
         }
-        p.blocks.unshift(tail);
-        return p;
       }
+      if (!consumed) {
+        tail = p.blocks.pop();
+        tail[0] = x;
+        tail[1] = y;
+      }
+      p.blocks.unshift(tail);
+    return p;
     });
     if (consumed) {
       this.addFood();
