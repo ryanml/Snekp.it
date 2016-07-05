@@ -36,22 +36,23 @@ window.onload = function() {
     }
     sendAction(e) {
       var key = e.keyCode;
-      var action;
       switch (key) {
         case 37:
-          action = 'LEFT';
+          this.action = this.action !== 'RIGHT' ? 'LEFT' : false;
           break;
         case 38:
-          action = 'UP';
+          this.action = this.action !== 'DOWN' ? 'UP' : false;
           break;
         case 39:
-          action = 'RIGHT';
+          this.action = this.action !== 'LEFT' ? 'RIGHT' : false;
           break;
         case 40:
-          action = 'DOWN';
+          this.action = this.action !== 'UP' ? 'DOWN' : false;
           break;
       }
-      socket.emit('player-movement', action);
+      if (this.action) {
+        socket.emit('player-movement', this.action);
+      }
     }
     domActions() {
       this.foodImage = document.createElement('img');
