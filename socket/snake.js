@@ -15,7 +15,7 @@ module.exports = class SnakeActions {
   }
   addFood() {
     var coords = this.genRandomCoords([this.gridWidth, this.gridHeight]);
-    this.gameState.foodCoords = coords;
+    this.gameState.foodCoords.push(coords);
   }
   addPlayer(id) {
     var coords = this.genRandomCoords([this.gridWidth, this.gridHeight]);
@@ -28,10 +28,19 @@ module.exports = class SnakeActions {
     });
     this.gameState.numPlayers = this.gameState.players.length;
   }
-  removePlayer(id) {
+  removePlayer(id, killed) {
     var players = this.gameState.players;
+    var deadPlayer = this.gameState.players.filter(p => p.id === id);
     this.gameState.players = players.filter(p => p.id !== id);
     this.gameState.numPlayers = this.gameState.players.length;
+    // If the player was killed, add food in their wake
+    if (killed) {
+      // For every other block, add food at that coordinate
+      for (var b = 0; b < deadPlayer.blocks.length; b += 2) {
+        var block = deadPlayer.blocks[b];
+        this.gameState.foodCoords.push(block[0], block[1]);
+      }
+    }
   }
   genRandomCoords(limits) {
     var noConflict = false;
@@ -50,8 +59,10 @@ module.exports = class SnakeActions {
       // Make sure coordinates aren't where food or another player is
       var players = this.gameState.players;
       var foodCoords = this.gameState.foodCoords;
-      if (x === foodCoords[0] && y === foodCoords[1]) {
-        conflicts++;
+      for (var f = 0; f < foodCoords.length; f++) {
+        if (x === foodCoords[f][0] && y === foodCoords[f][1]) {
+          conflicts++;
+        }
       }
       for (var p = 0; p < players.length; p++) {
         for (var b = 0; b < players[p].blocks.length; b++) {
@@ -125,13 +136,13 @@ module.exports = class SnakeActions {
       // Check if the player has hit a wall
       if ((x > horBounds || x < 0) ||
         y > verBounds || y < 0) {
-        casualties.push(p.id);
+        casualties.push({id: p.id, killed: false});
         return p;
       }
       // Check if a player has collided with themselves
       for (var b = 1; b < p.blocks.length; b++) {
         if (x === p.blocks[b][0] && y === p.blocks[b][1]) {
-          casualties.push(p.id);
+          casualties.push({id: p.id, killed: false});
           return p;
         }
       }
@@ -140,7 +151,7 @@ module.exports = class SnakeActions {
         if (players[l].id !== p.id) {
           for (var o = 0; o < players[l].blocks.length; o++) {
             if (x === players[l].blocks[o][0] && y === players[l].blocks[o][1]) {
-              casualties.push(p.id);
+              casualties.push({id: p.id, killed: true});
               return p;
             }
           }
@@ -148,33 +159,38 @@ module.exports = class SnakeActions {
       }
       return p;
     });
-    casualties.map(id => this.removePlayer(id));
+    casualties.map(deathObj => {
+      this.removePlayer(deathObj.id, deathObj.killed);
+    });
   }
   checkConsumption() {
     var foodCoords = this.gameState.foodCoords;
-    var consumed = false;
+    var tail, consumed = false;
     this.gameState.players.map(p => {
       var x = p.blocks[0][0];
       var y = p.blocks[0][1];
-      if (x === foodCoords[0] && y === foodCoords[1]) {
-        // Add new block
-        var tail = [x, y];
-        p.blocks.push([p.blocks[0][0], p.blocks[0][1]]);
-        // Increment score, set consumed to true
-        p.score++;
-        // Update high score
-        if (p.score > this.gameState.highScore) {
-          this.gameState.highScore = p.score;
+      for (var f = 0; f < foodCoords.length; f++) {
+        if (x === foodCoords[f][0] && y === foodCoords[f][1]) {
+          // Remove food from foodCoords
+          foodCoords.splice(f, 1);
+          // Add new block
+          tail = [x, y];
+          p.blocks.push([p.blocks[0][0], p.blocks[0][1]]);
+          // Increment score, set consumed to true
+          p.score++;
+          // Update high score
+          if (p.score > this.gameState.highScore) {
+            this.gameState.highScore = p.score;
+          }
+          consumed = true;
+        } else {
+          tail = p.blocks.pop();
+          tail[0] = x;
+          tail[1] = y;
         }
-        consumed = true;
+        p.blocks.unshift(tail);
+        return p;
       }
-      else {
-        var tail = p.blocks.pop();
-        tail[0] = x;
-        tail[1] = y;
-      }
-      p.blocks.unshift(tail);
-      return p;
     });
     if (consumed) {
       this.addFood();

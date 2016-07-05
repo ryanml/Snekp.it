@@ -30,7 +30,9 @@ window.onload = function() {
       this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
       // Draw food
       var foodCoords = this.gameState.foodCoords;
-      this.context.drawImage(this.foodImage, foodCoords[0], foodCoords[1]);
+      for (var f = 0; f < foodCoords.length; f++) {
+        this.context.drawImage(this.foodImage, foodCoords[f][0], foodCoords[f][1]);
+      }
       // Draw players
       var players = this.gameState.players;
       for (var p = 0; p < players.length; p++) {
