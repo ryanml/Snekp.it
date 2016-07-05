@@ -26,7 +26,7 @@ exports.socket = function(http) {
     updateLoop = setInterval(function() {
       snake.updatePositions();
       io.emit('state-change', snake.gameState);
-    }, 100);
+    }, 75);
     // When a player moves, change player direction
     socket.on('player-movement', function(action) {
       snake.updatePlayerDirection(id, action);
