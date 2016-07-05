@@ -5,31 +5,39 @@ window.onload = function() {
       this.id = id;
       this.blockSize = 15;
       this.action = false;
+      this.gameState = {};
       this.domActions();
     }
-    checkLife(gameState) {
-      var player = gameState.players.filter(p => p.id === this.id);
+    updateGameState(newState) {
+      this.gameState = newState;
+    }
+    checkLife() {
+      var player = this.gameState.players.filter(p => p.id === this.id);
       return player.length === 0 ? false : true;
     }
-    putStats(gameState) {
-      var player = gameState.players.filter(p => p.id === this.id);
-      this.scoreSpan.innerHTML = player[0].score;
-      this.highScoreSpan.innerHTML = gameState.highScore;
-      this.playerSpan.innerHTML = gameState.numPlayers;
+    getScore() {
+      var player = this.gameState.players.filter(p => p.id === this.id);
+      return player[0].score;
     }
-    drawState(gameState) {
+    putStats() {
+      var player = this.gameState.players.filter(p => p.id === this.id);
+      this.scoreSpan.innerHTML = player[0].score;
+      this.highScoreSpan.innerHTML = this.gameState.highScore;
+      this.playerSpan.innerHTML = this.gameState.numPlayers;
+    }
+    drawState() {
       // Clear old state
       this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
       // Draw food
-      this.context.fillStyle = '#ff0000';
-      var foodCoords = gameState.foodCoords;
+      var foodCoords = this.gameState.foodCoords;
       this.context.drawImage(this.foodImage, foodCoords[0], foodCoords[1]);
       // Draw players
-      var players = gameState.players;
+      var players = this.gameState.players;
       for (var p = 0; p < players.length; p++) {
         this.context.fillStyle = players[p].color;
         for (var b = 0; b < players[p].blocks.length; b++) {
           var blocks = players[p].blocks;
+          this.context.strokeRect(blocks[b][0], blocks[b][1], this.blockSize, this.blockSize);
           this.context.fillRect(blocks[b][0], blocks[b][1], this.blockSize, this.blockSize);
         }
       }
@@ -38,18 +46,27 @@ window.onload = function() {
       var key = e.keyCode;
       switch (key) {
         case 37:
-          this.action = this.action !== 'RIGHT' ? 'LEFT' : false;
+          if (this.action !== 'RIGHT' || score === 0) {
+            this.action = 'LEFT';
+          }
           break;
         case 38:
-          this.action = this.action !== 'DOWN' ? 'UP' : false;
+          if (this.action !== 'DOWN' || score === 0) {
+            this.action = 'UP';
+          }
           break;
         case 39:
-          this.action = this.action !== 'LEFT' ? 'RIGHT' : false;
+          if (this.action !== 'LEFT' || score === 0) {
+            this.action = 'RIGHT';
+          }
           break;
         case 40:
-          this.action = this.action !== 'UP' ? 'DOWN' : false;
+          if (this.action !== 'UP' || score === 0) {
+            this.action = 'DOWN';
+          }
           break;
       }
+      console.log(this.action);
       if (this.action) {
         socket.emit('player-movement', this.action);
       }
@@ -59,6 +76,7 @@ window.onload = function() {
       this.foodImage.src = '/img/food.gif';
       this.canvas = document.getElementById('game-canvas');
       this.context = this.canvas.getContext('2d');
+      this.context.strokeStyle = '#000000';
       this.scoreSpan = document.getElementById('score');
       this.highScoreSpan = document.getElementById('high-score');
       this.playerSpan = document.getElementById('num-players');
@@ -71,8 +89,7 @@ window.onload = function() {
       location.reload();
     }
   }
-  var clientId;
-  var gameHandler;
+  var clientId, gameHandler, score;
   var socket = io();
   socket.on('client-id', function(id) {
     if (!clientId) {
@@ -81,11 +98,13 @@ window.onload = function() {
     }
   });
   socket.on('state-change', function(newState) {
-    if (gameHandler.checkLife(newState)) {
-      gameHandler.putStats(newState);
+    gameHandler.updateGameState(newState);
+    if (gameHandler.checkLife()) {
+      score = gameHandler.getScore();
+      gameHandler.putStats();
     } else {
       gameHandler.deathPrompt.style.display = 'block';
     }
-    gameHandler.drawState(newState);
+    gameHandler.drawState();
   });
 }
