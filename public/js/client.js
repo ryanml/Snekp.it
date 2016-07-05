@@ -66,7 +66,6 @@ window.onload = function() {
           }
           break;
       }
-      console.log(this.action);
       if (this.action) {
         socket.emit('player-movement', this.action);
       }

@@ -13,24 +13,59 @@ module.exports = class SnakeActions {
     this.gridHeight = 540;
     this.blockSize = 15;
   }
-  genRandomCoord(limit) {
-    return Math.floor(
-      Math.ceil(
-        (Math.random() * (limit - this.blockSize)) / this.blockSize
-      ) * this.blockSize
-    );
+  addFood() {
+    var coords = this.genRandomCoords([this.gridWidth, this.gridHeight]);
+    this.gameState.foodCoords = coords;
   }
   addPlayer(id) {
-    var x = this.genRandomCoord(this.gridWidth);
-    var y = this.genRandomCoord(this.gridHeight);
+    var coords = this.genRandomCoords([this.gridWidth, this.gridHeight]);
     this.gameState.players.push({
       id: id,
-      blocks: [[x, y]],
+      blocks: [coords],
       score: 0,
       direction: false,
       color: this.genRandomColor()
     });
     this.gameState.numPlayers = this.gameState.players.length;
+  }
+  removePlayer(id) {
+    var players = this.gameState.players;
+    this.gameState.players = players.filter(p => p.id !== id);
+    this.gameState.numPlayers = this.gameState.players.length;
+  }
+  genRandomCoords(limits) {
+    var noConflict = false;
+    var x, y;
+    const randCoord = (bound) => {
+      return Math.floor(
+        Math.ceil(
+          (Math.random() * (bound - this.blockSize)) / this.blockSize
+        ) * this.blockSize
+      );
+    };
+    while (!noConflict) {
+      var conflicts = 0;
+      x = randCoord(limits[0]);
+      y = randCoord(limits[1]);
+      // Make sure coordinates aren't where food or another player is
+      var players = this.gameState.players;
+      var foodCoords = this.gameState.foodCoords;
+      if (x === foodCoords[0] && y === foodCoords[1]) {
+        conflicts++;
+      }
+      for (var p = 0; p < players.length; p++) {
+        for (var b = 0; b < players[p].blocks.length; b++) {
+          var block = players[p].blocks[b];
+          if (x === block[0] && y === block[1]) {
+            conflicts++;
+          }
+        }
+      }
+      if (conflicts === 0) {
+        noConflict = true;
+      }
+    }
+    return [x, y];
   }
   genRandomColor() {
     var chars = 'ABCDEF0123456789';
@@ -48,16 +83,6 @@ module.exports = class SnakeActions {
       }
     }
     return hex;
-  }
-  removePlayer(id) {
-    var players = this.gameState.players;
-    this.gameState.players = players.filter(p => p.id !== id);
-    this.gameState.numPlayers = this.gameState.players.length;
-  }
-  addFood() {
-    var x = this.genRandomCoord(this.gridWidth);
-    var y = this.genRandomCoord(this.gridHeight);
-    this.gameState.foodCoords = [x, y];
   }
   updatePlayerDirection(id, action) {
     var players = this.gameState.players;
