@@ -33,7 +33,10 @@ exports.socket = function(http) {
     });
     // When a player disconnects, remove their dot
     socket.on('disconnect', function() {
-      snake.removePlayer(id, false);
+      snake.removePlayer({
+        id: id,
+        kill: false
+      });
     })
 
   });

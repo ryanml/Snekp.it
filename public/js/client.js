@@ -31,7 +31,8 @@ window.onload = function() {
       // Draw food
       var foodCoords = this.gameState.foodCoords;
       for (var f = 0; f < foodCoords.length; f++) {
-        this.context.drawImage(this.foodImage, foodCoords[f][0], foodCoords[f][1]);
+        var coords = foodCoords[f].coords;
+        this.context.drawImage(this.foodImage, coords[0], coords[1]);
       }
       // Draw players
       var players = this.gameState.players;

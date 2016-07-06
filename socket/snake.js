@@ -15,7 +15,10 @@ module.exports = class SnakeActions {
   }
   addFood() {
     var coords = this.genRandomCoords([this.gridWidth, this.gridHeight]);
-    this.gameState.foodCoords.push(coords);
+    this.gameState.foodCoords.push({
+      coords: coords,
+      add: true
+    });
   }
   addPlayer(id) {
     var coords = this.genRandomCoords([this.gridWidth, this.gridHeight]);
@@ -28,17 +31,20 @@ module.exports = class SnakeActions {
     });
     this.gameState.numPlayers = this.gameState.players.length;
   }
-  removePlayer(id, killed) {
+  removePlayer(deathObj) {
     var players = this.gameState.players;
-    var deadPlayer = players.filter(p => p.id === id)[0];
-    this.gameState.players = players.filter(p => p.id !== id);
+    var deadPlayer = players.filter(p => p.id === deathObj.id)[0];
+    this.gameState.players = players.filter(p => p.id !== deathObj.id);
     this.gameState.numPlayers = this.gameState.players.length;
     // If the player was killed, add food in their wake
-    if (killed) {
+    if (deathObj.kill) {
       // For every other block, add food at that coordinate
       for (var b = 1; b < deadPlayer.blocks.length; b += 2) {
         var block = deadPlayer.blocks[b];
-        this.gameState.foodCoords.push([block[0], block[1]]);
+        this.gameState.foodCoords.push({
+          coords: [block[0], block[1]],
+          add: false
+        });
       }
     }
   }
@@ -60,7 +66,8 @@ module.exports = class SnakeActions {
       var players = this.gameState.players;
       var foodCoords = this.gameState.foodCoords;
       for (var f = 0; f < foodCoords.length; f++) {
-        if (x === foodCoords[f][0] && y === foodCoords[f][1]) {
+        var coords = foodCoords[f].coords;
+        if (x === coords[0] && y === coords[1]) {
           conflicts++;
         }
       }
@@ -138,75 +145,77 @@ module.exports = class SnakeActions {
         y > verBounds || y < 0) {
         casualties.push({
           id: p.id,
-          killed: true
+          kill: true,
         });
         return p;
       }
-      // Players with a one block length are exempt from these conditions
-      if (p.score > 0) {
-        // Check if a player has collided with themselves
-        for (var b = 1; b < p.blocks.length; b++) {
-          if (x === p.blocks[b][0] && y === p.blocks[b][1]) {
-            casualties.push({
-              id: p.id,
-              killed: false
-            });
-            return p;
-          }
+      // Check if a player has collided with themselves
+      for (var b = 1; b < p.blocks.length; b++) {
+        if (x === p.blocks[b][0] && y === p.blocks[b][1]) {
+          casualties.push({
+            id: p.id,
+            kill: true
+          });
+          return p;
         }
-        // Check if a player has collided with another player
-        for (var l = 0; l < players.length; l++) {
-          if (players[l].id !== p.id) {
-            for (var o = 0; o < players[l].blocks.length; o++) {
-              if (x === players[l].blocks[o][0] && y === players[l].blocks[o][1]) {
-                casualties.push({
-                  id: p.id,
-                  killed: true
-                });
-                return p;
-              }
+      }
+      // Check if a player has collided with another player
+      for (var l = 0; l < players.length; l++) {
+        if (players[l].id !== p.id) {
+          for (var o = 0; o < players[l].blocks.length; o++) {
+            if (x === players[l].blocks[o][0] && y === players[l].blocks[o][1]) {
+              casualties.push({
+                id: p.id,
+                kill: true
+              });
+              return p;
             }
           }
         }
       }
       return p;
     });
-    casualties.map(deathObj => {
-      this.removePlayer(deathObj.id, deathObj.killed);
-    });
+    casualties.map(deathObj => this.removePlayer(deathObj));
   }
   checkConsumption() {
     var foodCoords = this.gameState.foodCoords;
-    var tail, consumed = false;
     this.gameState.players.map(p => {
       var x = p.blocks[0][0];
       var y = p.blocks[0][1];
+      var selfConsumed = false;
+      var foodCoords = this.gameState.foodCoords;
       for (var f = 0; f < foodCoords.length; f++) {
-        if (x === foodCoords[f][0] && y === foodCoords[f][1]) {
-          // Remove food from foodCoords
-          foodCoords.splice(f, 1);
-          // Add new block
-          tail = [x, y];
-          p.blocks.push([p.blocks[0][0], p.blocks[0][1]]);
-          // Increment score, set consumed to true
-          p.score++;
-          // Update high score
-          if (p.score > this.gameState.highScore) {
-            this.gameState.highScore = p.score;
+        var coords = foodCoords[f].coords;
+        if (x === coords[0] && y === coords[1]) {
+          // Check if more food needs to be added
+          if (foodCoords[f].add) {
+            this.addFood();
           }
-          consumed = true;
+          // Remove food from foods
+          foodCoords.splice(f, 1);
+          selfConsumed = true;
+          break;
         }
       }
-      if (!consumed) {
-        tail = p.blocks.pop();
+      if (selfConsumed) {
+        // Add new block
+        var tail = [x, y];
+        if (p.score === 0) {
+          p.blocks.push([p.blocks[0][0], p.blocks[0][1]]);
+        }
+        // Increment score, set consumed to true
+        p.score++;
+        // Update high score
+        if (p.score > this.gameState.highScore) {
+          this.gameState.highScore = p.score;
+        }
+      } else {
+        var tail = p.blocks.pop();
         tail[0] = x;
         tail[1] = y;
       }
       p.blocks.unshift(tail);
-    return p;
+      return p;
     });
-    if (consumed) {
-      this.addFood();
-    }
   }
 }
