@@ -27,6 +27,12 @@ window.onload = function() {
     drawState() {
       // Clear old state
       this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      // Draw grid
+      for (var w = 0; w < this.canvas.width; w += this.blockSize) {
+        for (var h = 0; h < this.canvas.height; h += this.blockSize) {
+          this.context.strokeRect(w, h, this.blockSize, this.blockSize);
+        }
+      }
       // Draw food
       var foodCoords = this.gameState.foodCoords;
       for (var f = 0; f < foodCoords.length; f++) {
@@ -77,7 +83,7 @@ window.onload = function() {
       this.foodImage.src = '/img/food.gif';
       this.canvas = document.getElementById('game-canvas');
       this.context = this.canvas.getContext('2d');
-      this.context.strokeStyle = '#000000';
+      this.context.strokeStyle = '#d3d3d3';
       this.scoreSpan = document.getElementById('score');
       this.playerSpan = document.getElementById('num-players');
       this.deathPrompt = document.getElementById('death-info');

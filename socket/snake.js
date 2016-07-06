@@ -15,7 +15,7 @@ module.exports = class SnakeActions {
   addFood() {
     // There must be at least four pieces of food in play at a time
     var foods = this.gameState.foodCoords;
-    var neededFood = 0, required = 4;
+    var neededFood = 0, required = 6;
     if (foods.length < required) {
       neededFood = (required - foods.length);
     }
