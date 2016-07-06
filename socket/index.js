@@ -12,10 +12,6 @@ exports.socket = function(http) {
     var id = socket.id;
     // Send id to the client
     io.emit('client-id', id);
-    // Add initial food
-    if (snake.gameState.foodCoords.length === 0) {
-      snake.addFood();
-    }
     // Add new player on connection, send the client id
     snake.addPlayer(id);
     // To avoid double interval, clear loop on reload

@@ -17,12 +17,11 @@ window.onload = function() {
     }
     getScore() {
       var player = this.gameState.players.filter(p => p.id === this.id);
-      return player[0].score;
+      return player[0].sLength;
     }
     putStats() {
       var player = this.gameState.players.filter(p => p.id === this.id);
-      this.scoreSpan.innerHTML = player[0].score;
-      this.highScoreSpan.innerHTML = this.gameState.highScore;
+      this.scoreSpan.innerHTML = player[0].sLength;
       this.playerSpan.innerHTML = this.gameState.numPlayers;
     }
     drawState() {
@@ -80,7 +79,6 @@ window.onload = function() {
       this.context = this.canvas.getContext('2d');
       this.context.strokeStyle = '#000000';
       this.scoreSpan = document.getElementById('score');
-      this.highScoreSpan = document.getElementById('high-score');
       this.playerSpan = document.getElementById('num-players');
       this.deathPrompt = document.getElementById('death-info');
       this.replayButton = document.getElementById('replay');

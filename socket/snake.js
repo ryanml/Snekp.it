@@ -1,11 +1,10 @@
 'use strict';
 module.exports = class SnakeActions {
   constructor() {
-    // Game state object contains players, coordinates of food, and high score as attributes.
+    // Game state object contains players, coordinates of food, and the number of players as attributes.
     this.gameState = {
         players: [],
         foodCoords: [],
-        highScore: 0,
         numPlayers: 0
       }
       // Constant values for grid and block size
@@ -14,18 +13,25 @@ module.exports = class SnakeActions {
     this.blockSize = 15;
   }
   addFood() {
-    var coords = this.genRandomCoords([this.gridWidth, this.gridHeight]);
-    this.gameState.foodCoords.push({
-      coords: coords,
-      add: true
-    });
+    // There must be at least four pieces of food in play at a time
+    var foods = this.gameState.foodCoords;
+    var neededFood = 0, required = 4;
+    if (foods.length < required) {
+      neededFood = (required - foods.length);
+    }
+    for (var f = 0; f < neededFood; f++) {
+      var coords = this.genRandomCoords([this.gridWidth, this.gridHeight]);
+      this.gameState.foodCoords.push({
+        coords: coords
+      });
+    }
   }
   addPlayer(id) {
     var coords = this.genRandomCoords([this.gridWidth, this.gridHeight]);
     this.gameState.players.push({
       id: id,
       blocks: [coords],
-      score: 0,
+      sLength: 1,
       direction: false,
       color: this.genRandomColor()
     });
@@ -43,7 +49,6 @@ module.exports = class SnakeActions {
         var block = deadPlayer.blocks[b];
         this.gameState.foodCoords.push({
           coords: [block[0], block[1]],
-          add: false
         });
       }
     }
@@ -131,6 +136,7 @@ module.exports = class SnakeActions {
     });
     this.checkCollision();
     this.checkConsumption();
+    this.addFood();
   }
   checkCollision() {
     var casualties = [];
@@ -187,10 +193,6 @@ module.exports = class SnakeActions {
       for (var f = 0; f < foodCoords.length; f++) {
         var coords = foodCoords[f].coords;
         if (x === coords[0] && y === coords[1]) {
-          // Check if more food needs to be added
-          if (foodCoords[f].add) {
-            this.addFood();
-          }
           // Remove food from foods
           foodCoords.splice(f, 1);
           selfConsumed = true;
@@ -200,15 +202,12 @@ module.exports = class SnakeActions {
       if (selfConsumed) {
         // Add new block
         var tail = [x, y];
-        if (p.score === 0) {
+        // If our length is 1, push a block to the array so we have something to pop off
+        if (p.sLength === 1) {
           p.blocks.push([p.blocks[0][0], p.blocks[0][1]]);
         }
-        // Increment score, set consumed to true
-        p.score++;
-        // Update high score
-        if (p.score > this.gameState.highScore) {
-          this.gameState.highScore = p.score;
-        }
+        // Increment sLength
+        p.sLength++;
       } else {
         var tail = p.blocks.pop();
         tail[0] = x;
