@@ -3,6 +3,11 @@ window.onload = function() {
   class GameHandler {
     constructor(id) {
       this.id = id;
+      this.viewportX;
+      this.viewportY;
+      this.gridWidth;
+      this.gridHeight;
+      this.gridSize = 1500;
       this.blockSize = 15;
       this.action = false;
       this.gameState = {};
@@ -24,29 +29,74 @@ window.onload = function() {
       this.scoreSpan.innerHTML = player[0].sLength;
       this.playerSpan.innerHTML = this.gameState.numPlayers;
     }
+    setCellDimensions() {
+      var width = 0, height = 0;
+      for (var w = 0; w < this.canvas.width; w += this.blockSize) {
+        width++;
+      }
+      for (var h = 0; h < this.canvas.height; h += this.blockSize) {
+        height++;
+      }
+      // Width and height of grid in cells
+      this.gridWidth = width;
+      this.gridHeight = height;
+    }
+    calculateViewport() {
+      // Get the position of the player's head block
+      var player = this.gameState.players.filter(p => p.id === this.id)[0];
+      var headX = player.blocks[0][0], headY = player.blocks[0][1];
+      // Get offset from end of the grid for both x and y
+      var offsetX = (this.gridSize - headX);
+      var offsetY = (this.gridSize - headY);
+      if (offsetX < this.gridWidth) {
+        this.viewportX = [(this.gridSize - this.gridWidth) , this.gridSize];
+      } else {
+        this.viewportX = [headX - 1, (headX + this.gridWidth)];
+      }
+      if (offsetY < this.gridHeight) {
+        this.viewportY = [(this.gridSize - this.gridHeight), this.gridSize];
+      } else {
+        this.viewportY = [headY - 1, (headY + this.gridHeight)];
+      }
+    }
     drawState() {
       // Clear old state
       this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      // Draw grid
+      // Draw gridlines
       for (var w = 0; w < this.canvas.width; w += this.blockSize) {
         for (var h = 0; h < this.canvas.height; h += this.blockSize) {
           this.context.strokeRect(w, h, this.blockSize, this.blockSize);
         }
       }
-      // Draw food
+      const calc = (num) => {
+        return num * 15;
+      };
+      const checkBounds = (coords) => {
+        if ((coords[0] >= this.viewportX[0] && coords[0] <= this.viewportX[1]) &&
+            (coords[1] >= this.viewportY[0] && coords[1] <= this.viewportY[1])) {
+          return true;
+        } else {
+          return false;
+        }
+      };
+      // Draw food particles
       var foodCoords = this.gameState.foodCoords;
       for (var f = 0; f < foodCoords.length; f++) {
         var coords = foodCoords[f].coords;
-        this.context.drawImage(this.foodImage, coords[0], coords[1]);
+        if (checkBounds(coords)) {
+          this.context.drawImage(this.foodImage, calc(coords[0] - this.viewportX[0]), calc(coords[1] - this.viewportY[0]));
+        }
       }
-      // Draw players
+      // Draw player blocks
       var players = this.gameState.players;
       for (var p = 0; p < players.length; p++) {
         this.context.fillStyle = players[p].color;
         for (var b = 0; b < players[p].blocks.length; b++) {
           var blocks = players[p].blocks;
-          this.context.strokeRect(blocks[b][0], blocks[b][1], this.blockSize, this.blockSize);
-          this.context.fillRect(blocks[b][0], blocks[b][1], this.blockSize, this.blockSize);
+          if (checkBounds(blocks[b])) {
+            this.context.strokeRect(calc(blocks[b][0] - this.viewportX[0]), calc(blocks[b][1] - this.viewportY[0]), this.blockSize, this.blockSize);
+            this.context.fillRect(calc(blocks[b][0] - this.viewportX[0]), calc(blocks[b][1] - this.viewportY[0]), this.blockSize, this.blockSize);
+          }
         }
       }
     }
@@ -95,7 +145,10 @@ window.onload = function() {
       location.reload();
     }
   }
-  var clientId, gameHandler, score;
+  var score,
+      clientId,
+      gameHandler,
+      headPosition;
   var socket = io();
   socket.on('client-id', function(id) {
     if (!clientId) {
@@ -104,9 +157,11 @@ window.onload = function() {
     }
   });
   socket.on('state-change', function(newState) {
+    gameHandler.setCellDimensions();
     gameHandler.updateGameState(newState);
     if (gameHandler.checkLife()) {
       score = gameHandler.getScore();
+      gameHandler.calculateViewport();
       gameHandler.putStats();
     } else {
       gameHandler.deathPrompt.style.display = 'block';

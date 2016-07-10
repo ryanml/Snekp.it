@@ -8,26 +8,24 @@ module.exports = class SnakeActions {
         numPlayers: 0
       }
       // Constant values for grid and block size
-    this.gridWidth = 1080;
-    this.gridHeight = 540;
-    this.blockSize = 15;
+    this.gridSize = 1500;
   }
   addFood() {
     // There must be at least four pieces of food in play at a time
     var foods = this.gameState.foodCoords;
-    var neededFood = 0, required = 6;
+    var neededFood = 0, required = 5000;
     if (foods.length < required) {
       neededFood = (required - foods.length);
     }
     for (var f = 0; f < neededFood; f++) {
-      var coords = this.genRandomCoords([this.gridWidth, this.gridHeight]);
+      var coords = this.genRandomCoords();
       this.gameState.foodCoords.push({
         coords: coords
       });
     }
   }
   addPlayer(id) {
-    var coords = this.genRandomCoords([this.gridWidth, this.gridHeight]);
+    var coords = this.genRandomCoords();
     this.gameState.players.push({
       id: id,
       blocks: [coords],
@@ -53,20 +51,16 @@ module.exports = class SnakeActions {
       }
     }
   }
-  genRandomCoords(limits) {
-    var noConflict = false;
+  genRandomCoords() {
     var x, y;
-    const randCoord = (bound) => {
-      return Math.floor(
-        Math.ceil(
-          (Math.random() * (bound - this.blockSize)) / this.blockSize
-        ) * this.blockSize
-      );
+    var noConflict = false;
+    const randCoord = () => {
+      return Math.floor(Math.random() * (this.gridSize - 1));
     };
     while (!noConflict) {
       var conflicts = 0;
-      x = randCoord(limits[0]);
-      y = randCoord(limits[1]);
+      x = randCoord();
+      y = randCoord();
       // Make sure coordinates aren't where food or another player is
       var players = this.gameState.players;
       var foodCoords = this.gameState.foodCoords;
@@ -120,16 +114,16 @@ module.exports = class SnakeActions {
     this.gameState.players.map(p => {
       switch (p.direction) {
         case 'UP':
-          p.blocks[0][1] -= this.blockSize;
+          p.blocks[0][1] -= 1;
           break;
         case 'DOWN':
-          p.blocks[0][1] += this.blockSize;
+          p.blocks[0][1] += 1;
           break;
         case 'LEFT':
-          p.blocks[0][0] -= this.blockSize;
+          p.blocks[0][0] -= 1;
           break;
         case 'RIGHT':
-          p.blocks[0][0] += this.blockSize;
+          p.blocks[0][0] += 1;
           break;
       }
       return p;
@@ -144,11 +138,10 @@ module.exports = class SnakeActions {
       var x = p.blocks[0][0];
       var y = p.blocks[0][1];
       var players = this.gameState.players;
-      var horBounds = (this.gridWidth - this.blockSize);
-      var verBounds = (this.gridHeight - this.blockSize);
+      var bounds = (this.gridSize - 1);
       // Check if the player has hit a wall
-      if ((x > horBounds || x < 0) ||
-        y > verBounds || y < 0) {
+      if ((x > bounds || x < 0) ||
+        y > bounds || y < 0) {
         casualties.push({
           id: p.id,
           kill: true,
