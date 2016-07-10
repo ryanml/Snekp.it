@@ -11,7 +11,7 @@ module.exports = class SnakeActions {
     this.gridSize = 1500;
   }
   addFood() {
-    // There must be at least four pieces of food in play at a time
+    // There must be at least 5000 pieces of food in play at a time
     var foods = this.gameState.foodCoords;
     var neededFood = 0, required = 5000;
     if (foods.length < required) {

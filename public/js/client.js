@@ -51,12 +51,12 @@ window.onload = function() {
       if (offsetX < this.gridWidth) {
         this.viewportX = [(this.gridSize - this.gridWidth) , this.gridSize];
       } else {
-        this.viewportX = [headX - 1, (headX + this.gridWidth)];
+        this.viewportX = [headX - (this.gridWidth / 2), (headX + this.gridWidth)];
       }
       if (offsetY < this.gridHeight) {
         this.viewportY = [(this.gridSize - this.gridHeight), this.gridSize];
       } else {
-        this.viewportY = [headY - 1, (headY + this.gridHeight)];
+        this.viewportY = [headY - (this.gridHeight / 2), (headY + this.gridHeight)];
       }
     }
     drawState() {
