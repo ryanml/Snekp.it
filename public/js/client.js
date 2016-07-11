@@ -10,7 +10,7 @@ window.onload = function() {
       this.gridWidth;
       this.gridHeight;
       this.gridSize = 500;
-      this.blockSize = 15;
+      this.blockSize = 20;
       this.action = false;
       this.gameState = {};
       this.domActions();
@@ -62,9 +62,9 @@ window.onload = function() {
       // Clear old state
       this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
       // Draw background grid
-      for (var w = 0; w < this.canvas.width; w += 7) {
-        for (var h = 0; h < this.canvas.height; h += 7) {
-          this.context.strokeRect(w, h, 7, 7);
+      for (var w = 0; w < this.canvas.width; w += 35) {
+        for (var h = 0; h < this.canvas.height; h += 35) {
+          this.context.strokeRect(w, h, 35, 35);
         }
       }
       // Draw food particles
@@ -100,11 +100,31 @@ window.onload = function() {
           }
         }
       }
-      // Draw score box
+      // Set box attributes
       this.context.globalAlpha = 0.8;
       this.context.fillStyle = '#5A5A5A';
-      this.context.fillRect(this.canvas.width - 240, 15, 225, 260);
-      this.context.globalAlpha = 1;
+      this.context.font = '20px monospace';
+      // Draw leaderboard box
+      this.context.fillRect(this.canvas.width - 170, 10, 160, 260);
+      // Draw stats box
+      this.context.fillRect(10, this.canvas.height - 50, 285, 30);
+      // Draw placeholder leaderboard
+      this.context.fillStyle = '#ffffff';
+      this.context.fillText('Leaderboard', this.canvas.width - 160, 30);
+      this.context.fillText('1.', this.canvas.width - 160, 70);
+      this.context.fillText('2.', this.canvas.width - 160, 100);
+      this.context.fillText('3.', this.canvas.width - 160, 130);
+      this.context.fillText('4.', this.canvas.width - 160, 160);
+      this.context.fillText('5.', this.canvas.width - 160, 190);
+      // Draw score and position
+      this.context.font = '15px monospace';
+      var scoreString = 'Score: ' + score;
+      var posString = 'Position: (' + this.headX + ',' + this.headY +')';
+      this.context.fillText(scoreString, 20, this.canvas.height - 30);
+      this.context.fillText(posString, 120, this.canvas.height - 30);
+      // Reset opacity and fillstyle
+      this.context.globalAlpha = 1.0;
+      this.context.fillStyle = '#d3d3d3';
     }
     sendAction(e) {
       var key = e.keyCode;
@@ -136,9 +156,9 @@ window.onload = function() {
     }
     domActions() {
       this.foodImage = document.createElement('img');
-      this.foodImage.src = '/img/food.gif';
+      this.foodImage.src = '/img/food.png';
       this.shieldImage = document.createElement('img');
-      this.shieldImage.src = '/img/shield.png';
+      this.shieldImage.src = '/img/health.png';
       this.canvas = document.getElementById('game-canvas');
       this.context = this.canvas.getContext('2d');
       this.context.strokeStyle = '#d3d3d3';

@@ -20,7 +20,7 @@ module.exports = class SnakeActions {
     var neededFood = 0, required = 1000;
     // There must be at least 40 shields in play at a time
     var shields = this.gameState.shieldCoords;
-    var neededShields = 0, requiredShields = 40;
+    var neededShields = 0, requiredShields = 30;
     if (foods.length < required) {
       neededFood = (required - foods.length);
     }
