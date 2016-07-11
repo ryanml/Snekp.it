@@ -26,11 +26,6 @@ window.onload = function() {
       var player = this.gameState.players.filter(p => p.id === this.id);
       return player[0].sLength;
     }
-    putStats() {
-      var player = this.gameState.players.filter(p => p.id === this.id);
-      this.scoreSpan.innerHTML = player[0].sLength;
-      this.playerSpan.innerHTML = this.gameState.numPlayers;
-    }
     setCellDimensions() {
       var width = 0, height = 0;
       for (var w = 0; w < this.canvas.width; w += this.blockSize) {
@@ -66,10 +61,10 @@ window.onload = function() {
       };
       // Clear old state
       this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      // Draw gridlines
-      for (var w = 0; w < this.canvas.width; w += this.blockSize) {
-        for (var h = 0; h < this.canvas.height; h += this.blockSize) {
-          this.context.strokeRect(w, h, this.blockSize, this.blockSize);
+      // Draw background grid
+      for (var w = 0; w < this.canvas.width; w += 5) {
+        for (var h = 0; h < this.canvas.height; h += 5) {
+          this.context.strokeRect(w, h, 5, 5);
         }
       }
       // Draw food particles
@@ -142,11 +137,6 @@ window.onload = function() {
       this.canvas = document.getElementById('game-canvas');
       this.context = this.canvas.getContext('2d');
       this.context.strokeStyle = '#d3d3d3';
-      this.scoreSpan = document.getElementById('score');
-      this.playerSpan = document.getElementById('num-players');
-      this.deathPrompt = document.getElementById('death-info');
-      this.replayButton = document.getElementById('replay');
-      this.replayButton.addEventListener('click', this.reloadPage);
       document.body.addEventListener('keydown', this.sendAction);
     }
     reloadPage() {
@@ -158,21 +148,33 @@ window.onload = function() {
       gameHandler,
       headPosition;
   var socket = io();
+  var canvas = document.getElementById('game-canvas');
+  // Adjust on resize
+  window.onresize = () => {
+    var width = (window.innerWidth);
+    var height = (window.innerHeight);
+    canvas.width = width;
+    canvas.height = height;
+  };
+  // Determine proper width/height for canvas
+  var width = (window.innerWidth);
+  var height = (window.innerHeight);
+  canvas.width = width;
+  canvas.height = height;
+  // Get player's client id
   socket.on('client-id', function(id) {
     if (!clientId) {
       clientId = id;
       gameHandler = new GameHandler(clientId);
     }
   });
+  // Action on state change
   socket.on('state-change', function(newState) {
     gameHandler.setCellDimensions();
     gameHandler.updateGameState(newState);
     if (gameHandler.checkLife()) {
       score = gameHandler.getScore();
       gameHandler.calculateViewport();
-      gameHandler.putStats();
-    } else {
-      gameHandler.deathPrompt.style.display = 'block';
     }
     gameHandler.drawState();
   });
