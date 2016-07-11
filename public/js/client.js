@@ -9,7 +9,7 @@ window.onload = function() {
       this.headY;
       this.gridWidth;
       this.gridHeight;
-      this.gridSize = 1500;
+      this.gridSize = 500;
       this.blockSize = 15;
       this.action = false;
       this.gameState = {};
@@ -62,9 +62,9 @@ window.onload = function() {
       // Clear old state
       this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
       // Draw background grid
-      for (var w = 0; w < this.canvas.width; w += 5) {
-        for (var h = 0; h < this.canvas.height; h += 5) {
-          this.context.strokeRect(w, h, 5, 5);
+      for (var w = 0; w < this.canvas.width; w += 7) {
+        for (var h = 0; h < this.canvas.height; h += 7) {
+          this.context.strokeRect(w, h, 7, 7);
         }
       }
       // Draw food particles
@@ -100,6 +100,11 @@ window.onload = function() {
           }
         }
       }
+      // Draw score box
+      this.context.globalAlpha = 0.8;
+      this.context.fillStyle = '#5A5A5A';
+      this.context.fillRect(this.canvas.width - 240, 15, 225, 260);
+      this.context.globalAlpha = 1;
     }
     sendAction(e) {
       var key = e.keyCode;
