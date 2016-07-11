@@ -5,6 +5,8 @@ window.onload = function() {
       this.id = id;
       this.viewportX;
       this.viewportY;
+      this.headX;
+      this.headY;
       this.gridWidth;
       this.gridHeight;
       this.gridSize = 1500;
@@ -44,22 +46,24 @@ window.onload = function() {
     calculateViewport() {
       // Get the position of the player's head block
       var player = this.gameState.players.filter(p => p.id === this.id)[0];
-      var headX = player.blocks[0][0], headY = player.blocks[0][1];
+      this.headX = player.blocks[0][0], this.headY = player.blocks[0][1];
       // Get offset from end of the grid for both x and y
-      var offsetX = (this.gridSize - headX);
-      var offsetY = (this.gridSize - headY);
-      if (offsetX < this.gridWidth) {
-        this.viewportX = [(this.gridSize - this.gridWidth) , this.gridSize];
-      } else {
-        this.viewportX = [headX - (this.gridWidth / 2), (headX + this.gridWidth)];
-      }
-      if (offsetY < this.gridHeight) {
-        this.viewportY = [(this.gridSize - this.gridHeight), this.gridSize];
-      } else {
-        this.viewportY = [headY - (this.gridHeight / 2), (headY + this.gridHeight)];
-      }
+      this.viewportX = [this.headX - (this.gridWidth / 2), (this.headX + this.gridWidth)];
+      this.viewportY = [this.headY - (this.gridHeight / 2), (this.headY + this.gridHeight)];
     }
     drawState() {
+      // Helper functions
+      const calc = (num) => {
+        return num * this.blockSize;
+      };
+      const checkViewBounds = (coords) => {
+        if ((coords[0] >= this.viewportX[0] && coords[0] <= this.viewportX[1]) &&
+            (coords[1] >= this.viewportY[0] && coords[1] <= this.viewportY[1])) {
+          return true;
+        } else {
+          return false;
+        }
+      };
       // Clear old state
       this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
       // Draw gridlines
@@ -68,22 +72,11 @@ window.onload = function() {
           this.context.strokeRect(w, h, this.blockSize, this.blockSize);
         }
       }
-      const calc = (num) => {
-        return num * 15;
-      };
-      const checkBounds = (coords) => {
-        if ((coords[0] >= this.viewportX[0] && coords[0] <= this.viewportX[1]) &&
-            (coords[1] >= this.viewportY[0] && coords[1] <= this.viewportY[1])) {
-          return true;
-        } else {
-          return false;
-        }
-      };
       // Draw food particles
       var foodCoords = this.gameState.foodCoords;
       for (var f = 0; f < foodCoords.length; f++) {
         var coords = foodCoords[f].coords;
-        if (checkBounds(coords)) {
+        if (checkViewBounds(coords)) {
           this.context.drawImage(this.foodImage, calc(coords[0] - this.viewportX[0]), calc(coords[1] - this.viewportY[0]));
         }
       }
@@ -93,7 +86,7 @@ window.onload = function() {
         this.context.fillStyle = players[p].color;
         for (var b = 0; b < players[p].blocks.length; b++) {
           var blocks = players[p].blocks;
-          if (checkBounds(blocks[b])) {
+          if (checkViewBounds(blocks[b])) {
             this.context.strokeRect(calc(blocks[b][0] - this.viewportX[0]), calc(blocks[b][1] - this.viewportY[0]), this.blockSize, this.blockSize);
             this.context.fillRect(calc(blocks[b][0] - this.viewportX[0]), calc(blocks[b][1] - this.viewportY[0]), this.blockSize, this.blockSize);
           }
