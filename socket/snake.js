@@ -5,21 +5,37 @@ module.exports = class SnakeActions {
     this.gameState = {
         players: [],
         foodCoords: [],
+        shieldCoords: [],
         numPlayers: 0
       }
-      // Constant values for grid and block size
+    // gridSize
     this.gridSize = 1500;
+    // When a player picks up a shield, they will be immune for 133 state changes.
+    // This is about 10 seconds. This can be stacked with multiple shields.
+    this.immuneTime = 133;
   }
-  addFood() {
+  addItems() {
     // There must be at least 5000 pieces of food in play at a time
     var foods = this.gameState.foodCoords;
     var neededFood = 0, required = 5000;
+    // There must be at least 200 shields in play at a time
+    var shields = this.gameState.shieldCoords;
+    var neededShields = 0, requiredShields = 200;
     if (foods.length < required) {
       neededFood = (required - foods.length);
+    }
+    if (shields.length < requiredShields) {
+      neededShields = (requiredShields - shields.length);
     }
     for (var f = 0; f < neededFood; f++) {
       var coords = this.genRandomCoords();
       this.gameState.foodCoords.push({
+        coords: coords
+      });
+    }
+    for (var s = 0; s < neededShields; s++) {
+      var coords = this.genRandomCoords();
+      this.gameState.shieldCoords.push({
         coords: coords
       });
     }
@@ -30,6 +46,7 @@ module.exports = class SnakeActions {
       id: id,
       blocks: [coords],
       sLength: 1,
+      immunity: 0,
       direction: false,
       color: this.genRandomColor()
     });
@@ -61,11 +78,18 @@ module.exports = class SnakeActions {
       var conflicts = 0;
       x = randCoord();
       y = randCoord();
-      // Make sure coordinates aren't where food or another player is
+      // Make sure coordinates don't conflict with items or another player
       var players = this.gameState.players;
       var foodCoords = this.gameState.foodCoords;
+      var shieldCoords = this.gameState.shieldCoords;
       for (var f = 0; f < foodCoords.length; f++) {
         var coords = foodCoords[f].coords;
+        if (x === coords[0] && y === coords[1]) {
+          conflicts++;
+        }
+      }
+      for (var s = 0; s < shieldCoords.length; s++) {
+        var coords = shieldCoords[s].coords;
         if (x === coords[0] && y === coords[1]) {
           conflicts++;
         }
@@ -130,7 +154,7 @@ module.exports = class SnakeActions {
     });
     this.checkCollision();
     this.checkConsumption();
-    this.addFood();
+    this.addItems();
   }
   checkCollision() {
     var casualties = [];
@@ -149,28 +173,36 @@ module.exports = class SnakeActions {
         return p;
       }
       // Check if a player has collided with themselves
-      for (var b = 1; b < p.blocks.length; b++) {
-        if (x === p.blocks[b][0] && y === p.blocks[b][1]) {
-          casualties.push({
-            id: p.id,
-            kill: true
-          });
-          return p;
+      if (p.immunity === 0) {
+        for (var b = 1; b < p.blocks.length; b++) {
+          if (x === p.blocks[b][0] && y === p.blocks[b][1]) {
+            casualties.push({
+              id: p.id,
+              kill: true
+            });
+            return p;
+          }
         }
       }
       // Check if a player has collided with another player
-      for (var l = 0; l < players.length; l++) {
-        if (players[l].id !== p.id) {
-          for (var o = 0; o < players[l].blocks.length; o++) {
-            if (x === players[l].blocks[o][0] && y === players[l].blocks[o][1]) {
-              casualties.push({
-                id: p.id,
-                kill: true
-              });
-              return p;
+      if (p.immunity === 0) {
+        for (var l = 0; l < players.length; l++) {
+          if (players[l].id !== p.id) {
+            for (var o = 0; o < players[l].blocks.length; o++) {
+              if (x === players[l].blocks[o][0] && y === players[l].blocks[o][1]) {
+                casualties.push({
+                  id: p.id,
+                  kill: true
+                });
+                return p;
+              }
             }
           }
         }
+      }
+      // If player immunity is greater than 0, remove one cycle from it
+      if (p.immunity > 0) {
+        p.immunity--;
       }
       return p;
     });
@@ -183,6 +215,8 @@ module.exports = class SnakeActions {
       var y = p.blocks[0][1];
       var selfConsumed = false;
       var foodCoords = this.gameState.foodCoords;
+      var shieldCoords = this.gameState.shieldCoords;
+      // Check if the player has eaten food
       for (var f = 0; f < foodCoords.length; f++) {
         var coords = foodCoords[f].coords;
         if (x === coords[0] && y === coords[1]) {
@@ -190,6 +224,16 @@ module.exports = class SnakeActions {
           foodCoords.splice(f, 1);
           selfConsumed = true;
           break;
+        }
+      }
+      // Check if the player has picked up a shield
+      for (var s = 0; s < shieldCoords.length; s++) {
+        var coords = shieldCoords[s].coords;
+        if (x === coords[0] && y === coords[1]) {
+          // Add immune time to player
+          p.immunity += this.immuneTime;
+          // Remove shield
+          shieldCoords.splice(s, 1);
         }
       }
       if (selfConsumed) {

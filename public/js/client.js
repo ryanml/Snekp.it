@@ -80,6 +80,14 @@ window.onload = function() {
           this.context.drawImage(this.foodImage, calc(coords[0] - this.viewportX[0]), calc(coords[1] - this.viewportY[0]));
         }
       }
+      // Draw shields
+      var shieldCoords = this.gameState.shieldCoords;
+      for (var s = 0; s < shieldCoords.length; s++) {
+        var coords = shieldCoords[s].coords;
+        if (checkViewBounds(coords)) {
+          this.context.drawImage(this.shieldImage, calc(coords[0] - this.viewportX[0]), calc(coords[1] - this.viewportY[0]));
+        }
+      }
       // Draw player blocks
       var players = this.gameState.players;
       for (var p = 0; p < players.length; p++) {
@@ -87,8 +95,13 @@ window.onload = function() {
         for (var b = 0; b < players[p].blocks.length; b++) {
           var blocks = players[p].blocks;
           if (checkViewBounds(blocks[b])) {
+            // If the player is immune, draw a yellow border around them
+            if (players[p].immunity > 0) {
+              this.context.strokeStyle = '#ffff00';
+            }
             this.context.strokeRect(calc(blocks[b][0] - this.viewportX[0]), calc(blocks[b][1] - this.viewportY[0]), this.blockSize, this.blockSize);
             this.context.fillRect(calc(blocks[b][0] - this.viewportX[0]), calc(blocks[b][1] - this.viewportY[0]), this.blockSize, this.blockSize);
+            this.context.strokeStyle = '#d3d3d3';
           }
         }
       }
@@ -124,6 +137,8 @@ window.onload = function() {
     domActions() {
       this.foodImage = document.createElement('img');
       this.foodImage.src = '/img/food.gif';
+      this.shieldImage = document.createElement('img');
+      this.shieldImage.src = '/img/shield.png';
       this.canvas = document.getElementById('game-canvas');
       this.context = this.canvas.getContext('2d');
       this.context.strokeStyle = '#d3d3d3';
