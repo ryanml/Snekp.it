@@ -51,6 +51,31 @@ window.onload = function() {
       const calc = (num) => {
         return num * this.blockSize;
       };
+      const drawBounds = (x, y) => {
+        var gS = this.gridSize;
+        var gW = this.gridWidth, gH = this.gridHeight;
+        var vX = this.viewportX[0], vY = this.viewportY[0];
+        if (x < gS) {
+          for (var i = 1; i < (gW / 2); i++) {
+            this.context.fillRect(calc((x - (x + i)) - vX), calc(y - vY), this.blockSize, this.blockSize);
+          }
+        }
+        if ((gS - x) < gW) {
+          for (var i = 0; i < (gW / 2); i++) {
+            this.context.fillRect(calc(((gS - x) + (gW / 2)) + i) ,calc(y - vY), this.blockSize, this.blockSize);
+          }
+        }
+        if (y < gW) {
+          for (var i = 1; i < (gW / 2); i++) {
+            this.context.fillRect(calc(x - vX), calc((y - (y + i)) - vY), this.blockSize, this.blockSize);
+          }
+        }
+        if ((gS - y) < gH) {
+          for (var i = 0; i < (gW / 2); i++) {
+            this.context.fillRect(calc(x - vX), calc(((gS - y) + (gH / 2)) + i), this.blockSize, this.blockSize);
+          }
+        }
+      };
       const checkViewBounds = (coords) => {
         if ((coords[0] >= this.viewportX[0] && coords[0] <= this.viewportX[1]) &&
             (coords[1] >= this.viewportY[0] && coords[1] <= this.viewportY[1])) {
@@ -62,11 +87,13 @@ window.onload = function() {
       // Clear old state
       this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
       // Draw background grid
-      for (var w = 0; w < this.canvas.width; w += 35) {
-        for (var h = 0; h < this.canvas.height; h += 35) {
-          this.context.strokeRect(w, h, 35, 35);
+      for (var w = 0; w < this.canvas.width; w += this.blockSize) {
+        for (var h = 0; h < this.canvas.height; h += this.blockSize) {
+          this.context.strokeRect(w, h, this.blockSize, this.blockSize);
         }
       }
+      // Draw bound lines
+      drawBounds(this.headX, this.headY);
       // Draw food particles
       var foodCoords = this.gameState.foodCoords;
       for (var f = 0; f < foodCoords.length; f++) {
