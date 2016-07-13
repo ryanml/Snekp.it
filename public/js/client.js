@@ -56,23 +56,31 @@ window.onload = function() {
         var gW = this.gridWidth, gH = this.gridHeight;
         var vX = this.viewportX[0], vY = this.viewportY[0];
         if (x < gS) {
-          for (var i = 1; i < (gW / 2); i++) {
-            this.context.fillRect(calc((x - (x + i)) - vX), calc(y - vY), this.blockSize, this.blockSize);
+          for (var fy = ((gH / 2) * -1); fy < gH; fy++) {
+            for (var i = 1; i < (gW / 2); i++) {
+              this.context.fillRect(calc((x - ((x + 1) + i)) - vX), calc((y - vY) + fy), this.blockSize, this.blockSize);
+            }
           }
         }
         if ((gS - x) < gW) {
-          for (var i = 0; i < (gW / 2); i++) {
-            this.context.fillRect(calc(((gS - x) + (gW / 2)) + i) ,calc(y - vY), this.blockSize, this.blockSize);
+          for (var fy = ((gH / 2) * -1); fy < gH; fy++) {
+            for (var i = 0; i < (gW / 2); i++) {
+              this.context.fillRect(calc(((gS - x) + (gW / 2)) + i), calc((y - vY) + fy), this.blockSize, this.blockSize);
+            }
           }
         }
         if (y < gW) {
-          for (var i = 1; i < (gW / 2); i++) {
-            this.context.fillRect(calc(x - vX), calc((y - (y + i)) - vY), this.blockSize, this.blockSize);
+          for (var fx = ((gW / 2) * -1); fx < gW; fx++) {
+            for (var i = 1; i < (gW / 2); i++) {
+              this.context.fillRect(calc((x - vX) + fx), calc((y - (y + i)) - vY), this.blockSize, this.blockSize);
+            }
           }
         }
         if ((gS - y) < gH) {
-          for (var i = 0; i < (gW / 2); i++) {
-            this.context.fillRect(calc(x - vX), calc(((gS - y) + (gH / 2)) + i), this.blockSize, this.blockSize);
+          for (var fx = ((gW / 2) * -1); fx < gW; fx++) {
+            for (var i = 0; i < (gW / 2); i++) {
+              this.context.fillRect(calc((x - vX) + fx), calc(((gS - y) + (gH / 2)) + i), this.blockSize, this.blockSize);
+            }
           }
         }
       };
@@ -93,7 +101,9 @@ window.onload = function() {
         }
       }
       // Draw bound lines
+      this.context.fillStyle = '#ffffff';
       drawBounds(this.headX, this.headY);
+      this.context.fillStyle = '#d3d3d3';
       // Draw food particles
       var foodCoords = this.gameState.foodCoords;
       for (var f = 0; f < foodCoords.length; f++) {
@@ -113,16 +123,21 @@ window.onload = function() {
       // Draw player blocks
       var players = this.gameState.players;
       for (var p = 0; p < players.length; p++) {
-        this.context.fillStyle = players[p].color;
         for (var b = 0; b < players[p].blocks.length; b++) {
           var blocks = players[p].blocks;
           if (checkViewBounds(blocks[b])) {
+            this.context.fillStyle = players[p].color;
             // If the player is immune, draw a yellow border around them
             if (players[p].immunity > 0) {
               this.context.strokeStyle = '#ffff00';
             }
             this.context.strokeRect(calc(blocks[b][0] - this.viewportX[0]), calc(blocks[b][1] - this.viewportY[0]), this.blockSize, this.blockSize);
             this.context.fillRect(calc(blocks[b][0] - this.viewportX[0]), calc(blocks[b][1] - this.viewportY[0]), this.blockSize, this.blockSize);
+            // Draw the nickname under the head
+            if (b === players[p].blocks.length - 1) {
+              this.context.fillStyle = '#000000';
+              this.context.fillText(players[p].id, calc(blocks[0][0] - this.viewportX[0]) - 20, calc(blocks[0][1] - this.viewportY[0]) + 35);
+            }
             this.context.strokeStyle = '#d3d3d3';
           }
         }
@@ -157,22 +172,22 @@ window.onload = function() {
       var key = e.keyCode;
       switch (key) {
         case 37:
-          if (this.action !== 'RIGHT' || score === 0) {
+          if (this.action !== 'RIGHT' || score === 1) {
             this.action = 'LEFT';
           }
           break;
         case 38:
-          if (this.action !== 'DOWN' || score === 0) {
+          if (this.action !== 'DOWN' || score === 1) {
             this.action = 'UP';
           }
           break;
         case 39:
-          if (this.action !== 'LEFT' || score === 0) {
+          if (this.action !== 'LEFT' || score === 1) {
             this.action = 'RIGHT';
           }
           break;
         case 40:
-          if (this.action !== 'UP' || score === 0) {
+          if (this.action !== 'UP' || score === 1) {
             this.action = 'DOWN';
           }
           break;
@@ -190,9 +205,6 @@ window.onload = function() {
       this.context = this.canvas.getContext('2d');
       this.context.strokeStyle = '#d3d3d3';
       document.body.addEventListener('keydown', this.sendAction);
-    }
-    reloadPage() {
-      location.reload();
     }
   }
   var score,
