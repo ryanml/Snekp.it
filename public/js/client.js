@@ -57,7 +57,7 @@ window.onload = function() {
         var vX = this.viewportX[0], vY = this.viewportY[0];
         if (x < gS) {
           for (var fy = ((gH / 2) * -1); fy < gH; fy++) {
-            for (var i = 1; i < (gW / 2); i++) {
+            for (var i = 0; i < (gW / 2); i++) {
               this.context.fillRect(calc((x - ((x + 1) + i)) - vX), calc((y - vY) + fy), this.blockSize, this.blockSize);
             }
           }
@@ -127,12 +127,13 @@ window.onload = function() {
           var blocks = players[p].blocks;
           if (checkViewBounds(blocks[b])) {
             this.context.fillStyle = players[p].color;
-            // If the player is immune, draw a yellow border around them
-            if (players[p].immunity > 0) {
-              this.context.strokeStyle = '#ffff00';
-            }
             this.context.strokeRect(calc(blocks[b][0] - this.viewportX[0]), calc(blocks[b][1] - this.viewportY[0]), this.blockSize, this.blockSize);
-            this.context.fillRect(calc(blocks[b][0] - this.viewportX[0]), calc(blocks[b][1] - this.viewportY[0]), this.blockSize, this.blockSize);
+            // If the player is immune, use the rainbow immune image for the blocks
+            if (players[p].immunity > 0) {
+              this.context.drawImage(this.immuneImage, calc(blocks[b][0] - this.viewportX[0]), calc(blocks[b][1] - this.viewportY[0]));
+            } else {
+              this.context.fillRect(calc(blocks[b][0] - this.viewportX[0]), calc(blocks[b][1] - this.viewportY[0]), this.blockSize, this.blockSize);
+            }
             // Draw the nickname under the head
             if (b === players[p].blocks.length - 1) {
               this.context.fillStyle = '#000000';
@@ -200,7 +201,9 @@ window.onload = function() {
       this.foodImage = document.createElement('img');
       this.foodImage.src = '/img/food.png';
       this.shieldImage = document.createElement('img');
-      this.shieldImage.src = '/img/health.png';
+      this.shieldImage.src = '/img/shield.png';
+      this.immuneImage = document.createElement('img');
+      this.immuneImage.src = '/img/immune.jpg';
       this.canvas = document.getElementById('game-canvas');
       this.context = this.canvas.getContext('2d');
       this.context.strokeStyle = '#d3d3d3';
