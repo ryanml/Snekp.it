@@ -17,9 +17,26 @@ body {
 }
 #replay-div {
   display:none;
+  position:fixed;
   padding:10px;
   text-align:center;
-  width: 20%;
-  margin-left:auto;
-  margin-right:auto;
+  width:20%;
+  top:30%;
+  left:50%;
+  margin-top:-50px;
+  margin-left:-100px;
+  opacity:0.8;
+  background:#d3d3d3;
+  border:1px solid #000000;
+  border-radius:5px;
+}
+#replay-div h4 {
+  color:#ff3333;
+}
+#replay {
+  padding:5px;
+  border-radius:5px;
+  border:1px solid #006600;
+  background:#00cc00;
+  color:#ffffff;
 }

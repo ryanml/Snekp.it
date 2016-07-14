@@ -143,6 +143,10 @@ window.onload = function() {
           }
         }
       }
+      // Call stat boxes
+      this.drawStatBoxes();
+    }
+    drawStatBoxes() {
       // Set box attributes
       this.context.globalAlpha = 0.8;
       this.context.fillStyle = '#5A5A5A';
@@ -153,13 +157,19 @@ window.onload = function() {
       this.context.fillRect(10, this.canvas.height - 50, 285, 30);
       // Draw placeholder leaderboard
       this.context.fillStyle = '#ffffff';
-      this.context.fillText('Leaderboard', this.canvas.width - 160, 30);
-      this.context.fillText('1.', this.canvas.width - 160, 70);
-      this.context.fillText('2.', this.canvas.width - 160, 100);
-      this.context.fillText('3.', this.canvas.width - 160, 130);
-      this.context.fillText('4.', this.canvas.width - 160, 160);
-      this.context.fillText('5.', this.canvas.width - 160, 190);
+      this.context.fillText('Leaderboard', this.canvas.width - 155, 30);
+      // Draw leaders
+      var leaders = this.gameState.leaders;
+      var x = this.canvas.width - 155, y = 70, yInc = 30;
+      for (var l = 0; l < leaders.length; l++) {
+        var pos = l + 1;
+        this.context.fillStyle = leaders[l].color;
+        var leadString = pos + '. ' + leaders[l].id;
+        this.context.fillText(leadString, x, y);
+        y += yInc;
+      }
       // Draw score and position
+      this.context.fillStyle = '#ffffff';
       this.context.font = '15px monospace';
       var scoreString = 'Score: ' + score;
       var posString = 'Position: (' + this.headX + ',' + this.headY +')';
@@ -207,7 +217,13 @@ window.onload = function() {
       this.canvas = document.getElementById('game-canvas');
       this.context = this.canvas.getContext('2d');
       this.context.strokeStyle = '#d3d3d3';
+      this.replayDiv = document.getElementById('replay-div');
+      this.replayButton = document.getElementById('replay');
+      this.replayButton.addEventListener('click', this.reloadPage);
       document.body.addEventListener('keydown', this.sendAction);
+    }
+    reloadPage() {
+      location.reload();
     }
   }
   var score,
@@ -242,6 +258,9 @@ window.onload = function() {
     if (gameHandler.checkLife()) {
       score = gameHandler.getScore();
       gameHandler.calculateViewport();
+    } else {
+      console.log(gameHandler.replayDiv);
+      gameHandler.replayDiv.style.display = 'block';
     }
     gameHandler.drawState();
   });

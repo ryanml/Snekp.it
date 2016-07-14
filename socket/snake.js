@@ -4,6 +4,7 @@ module.exports = class SnakeActions {
     // Game state object contains players, coordinates of food, and the number of players as attributes.
     this.gameState = {
         players: [],
+        leaders: [],
         foodCoords: [],
         shieldCoords: [],
         numPlayers: 0
@@ -51,6 +52,23 @@ module.exports = class SnakeActions {
       color: this.genRandomColor()
     });
     this.gameState.numPlayers = this.gameState.players.length;
+  }
+  calcLeaders() {
+    // Get array of objects with players' lengths and id
+    var players = this.gameState.players.map(p => {
+      return {
+        id: p.id,
+        score: p.sLength,
+        color: p.color
+      };
+    });
+    // Sort the player objects by score
+    var leaders = players.sort((c, p) => {
+      return c.score - p.score;
+    }).reverse();
+    // We would only like at most, 5 leaders at a time.
+    var sliceIndex = leaders.length >= 5 ? 5 : leaders.length;
+    this.gameState.leaders = leaders.slice(0, sliceIndex);
   }
   removePlayer(deathObj) {
     var players = this.gameState.players;
@@ -155,6 +173,7 @@ module.exports = class SnakeActions {
     this.checkCollision();
     this.checkConsumption();
     this.addItems();
+    this.calcLeaders();
   }
   checkCollision() {
     var casualties = [];
@@ -190,6 +209,9 @@ module.exports = class SnakeActions {
           if (players[l].id !== p.id) {
             for (var o = 0; o < players[l].blocks.length; o++) {
               if (x === players[l].blocks[o][0] && y === players[l].blocks[o][1]) {
+                // Add 10 to the other players score
+                players[l].sLength += 10;
+                // Push the colliding player to the casualties list
                 casualties.push({
                   id: p.id,
                   kill: true
