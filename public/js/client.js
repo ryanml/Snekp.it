@@ -9,7 +9,7 @@ window.onload = function() {
       this.headY;
       this.gridWidth;
       this.gridHeight;
-      this.gridSize = 500;
+      this.gridSize = 300;
       this.blockSize = 20;
       this.action = false;
       this.gameState = {};
@@ -27,7 +27,8 @@ window.onload = function() {
       return player[0].sLength;
     }
     setCellDimensions() {
-      var width = 0, height = 0;
+      var width = 0,
+        height = 0;
       for (var w = 0; w < this.canvas.width; w += this.blockSize) {
         width++;
       }
@@ -53,53 +54,50 @@ window.onload = function() {
       };
       const drawBounds = (x, y) => {
         var gS = this.gridSize;
-        var gW = this.gridWidth, gH = this.gridHeight;
-        var vX = this.viewportX[0], vY = this.viewportY[0];
+        var gW = this.gridWidth,
+          gH = this.gridHeight;
+        var vX = this.viewportX[0],
+          vY = this.viewportY[0];
         if (x < gS) {
           for (var fy = ((gH / 2) * -1); fy < gH; fy++) {
             for (var i = 0; i < (gW / 2); i++) {
-              this.context.fillRect(calc((x - ((x + 1) + i)) - vX), calc((y - vY) + fy), this.blockSize, this.blockSize);
+              this.context.strokeRect(calc((x - ((x + 1) + i)) - vX), calc((y - vY) + fy), this.blockSize, this.blockSize);
             }
           }
         }
         if ((gS - x) < gW) {
           for (var fy = ((gH / 2) * -1); fy < gH; fy++) {
             for (var i = 0; i < (gW / 2); i++) {
-              this.context.fillRect(calc(((gS - x) + (gW / 2)) + i), calc((y - vY) + fy), this.blockSize, this.blockSize);
+              this.context.strokeRect(calc(((gS - x) + (gW / 2)) + i), calc((y - vY) + fy), this.blockSize, this.blockSize);
             }
           }
         }
         if (y < gW) {
           for (var fx = ((gW / 2) * -1); fx < gW; fx++) {
             for (var i = 1; i < (gW / 2); i++) {
-              this.context.fillRect(calc((x - vX) + fx), calc((y - (y + i)) - vY), this.blockSize, this.blockSize);
+              this.context.strokeRect(calc((x - vX) + fx), calc((y - (y + i)) - vY), this.blockSize, this.blockSize);
             }
           }
         }
         if ((gS - y) < gH) {
           for (var fx = ((gW / 2) * -1); fx < gW; fx++) {
             for (var i = 0; i < (gW / 2); i++) {
-              this.context.fillRect(calc((x - vX) + fx), calc(((gS - y) + (gH / 2)) + i), this.blockSize, this.blockSize);
+              this.context.strokeRect(calc((x - vX) + fx), calc(((gS - y) + (gH / 2)) + i), this.blockSize, this.blockSize);
             }
           }
         }
       };
       const checkViewBounds = (coords) => {
         if ((coords[0] >= this.viewportX[0] && coords[0] <= this.viewportX[1]) &&
-            (coords[1] >= this.viewportY[0] && coords[1] <= this.viewportY[1])) {
+          (coords[1] >= this.viewportY[0] && coords[1] <= this.viewportY[1])) {
           return true;
-        } else {
+        }
+        else {
           return false;
         }
       };
       // Clear old state
       this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      // Draw background grid
-      for (var w = 0; w < this.canvas.width; w += this.blockSize) {
-        for (var h = 0; h < this.canvas.height; h += this.blockSize) {
-          this.context.strokeRect(w, h, this.blockSize, this.blockSize);
-        }
-      }
       // Draw bound lines
       this.context.fillStyle = '#ffffff';
       drawBounds(this.headX, this.headY);
@@ -131,17 +129,16 @@ window.onload = function() {
             // If the player is immune, use the rainbow immune image for the blocks
             if (players[p].immunity > 0) {
               this.context.drawImage(this.immuneImage, calc(blocks[b][0] - this.viewportX[0]), calc(blocks[b][1] - this.viewportY[0]));
-            } else {
+            }
+            else {
               this.context.fillRect(calc(blocks[b][0] - this.viewportX[0]), calc(blocks[b][1] - this.viewportY[0]), this.blockSize, this.blockSize);
             }
-            // Draw the nickname under the head
-            if (b === players[p].blocks.length - 1) {
-              this.context.fillStyle = '#000000';
-              this.context.fillText(players[p].nick, calc(blocks[0][0] - this.viewportX[0]) - 20, calc(blocks[0][1] - this.viewportY[0]) + 35);
-            }
-            this.context.strokeStyle = '#d3d3d3';
           }
         }
+        // Draw the nickname under the head
+        this.context.fillStyle = '#000000';
+        this.context.fillText(players[p].nick, calc(blocks[0][0] - this.viewportX[0]) - 20, calc(blocks[0][1] - this.viewportY[0]) + 35);
+        this.context.strokeStyle = '#d3d3d3';
       }
       // Call stat boxes
       this.drawStatBoxes();
@@ -152,18 +149,21 @@ window.onload = function() {
       this.context.fillStyle = '#5A5A5A';
       this.context.font = '20px monospace';
       // Draw leaderboard box
-      this.context.fillRect(this.canvas.width - 170, 10, 160, 260);
+      this.context.fillRect(this.canvas.width - 190, 10, 180, 260);
       // Draw stats box
       this.context.fillRect(10, this.canvas.height - 50, 285, 30);
       // Draw placeholder leaderboard
       this.context.fillStyle = '#ffffff';
-      this.context.fillText('Leaderboard', this.canvas.width - 155, 30);
+      this.context.fillText('Leaderboard', this.canvas.width - 170, 30);
       // Draw leaders
       var leaders = this.gameState.leaders;
-      var x = this.canvas.width - 155, y = 70, yInc = 30;
+      var x = this.canvas.width - 175,
+        y = 70,
+        yInc = 30;
       for (var l = 0; l < leaders.length; l++) {
         var pos = l + 1;
-        var leadString = pos + '. ' + leaders[l].nick;
+        var pNick = leaders[l].nick
+        var leadString = pos + '. ' + pNick;
         this.context.fillText(leadString, x, y);
         y += yInc;
       }
@@ -171,7 +171,7 @@ window.onload = function() {
       this.context.fillStyle = '#ffffff';
       this.context.font = '15px monospace';
       var scoreString = 'Score: ' + score;
-      var posString = 'Position: (' + this.headX + ',' + this.headY +')';
+      var posString = 'Position: (' + this.headX + ',' + this.headY + ')';
       this.context.fillText(scoreString, 20, this.canvas.height - 30);
       this.context.fillText(posString, 120, this.canvas.height - 30);
       // Reset opacity and fillstyle
@@ -226,10 +226,10 @@ window.onload = function() {
     }
   }
   var nick,
-      score,
-      clientId,
-      gameHandler,
-      headPosition;
+    score,
+    clientId,
+    gameHandler,
+    headPosition;
   var socket = io();
   var canvas = document.getElementById('game-canvas');
   // Adjust on resize
@@ -265,8 +265,8 @@ window.onload = function() {
       if (gameHandler.checkLife()) {
         score = gameHandler.getScore();
         gameHandler.calculateViewport();
-      } else {
-        console.log(gameHandler.replayDiv);
+      }
+      else {
         gameHandler.replayDiv.style.display = 'block';
       }
       gameHandler.drawState();
