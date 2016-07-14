@@ -10,10 +10,13 @@ exports.socket = function(http) {
   io.on('connection', function(socket) {
     // id associate with client connection
     var id = socket.id;
-    // Send id to the client
-    io.emit('client-id', id);
+    // Send id to the client and request the nickname
+    io.emit('request-nick', id);
     // Add new player on connection, send the client id
-    snake.addPlayer(id);
+    socket.on('receive-nick', function(nick) {
+      snake.addPlayer(nick, id);
+      io.emit('received-nick');
+    });
     // To avoid double interval, clear loop on reload
     if (updateLoop) {
       clearInterval(updateLoop);

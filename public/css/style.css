@@ -15,7 +15,7 @@ body {
 #game-canvas {
   float:left;
 }
-#replay-div {
+.prompt-div {
   display:none;
   position:fixed;
   padding:10px;

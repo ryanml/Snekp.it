@@ -41,10 +41,11 @@ module.exports = class SnakeActions {
       });
     }
   }
-  addPlayer(id) {
+  addPlayer(nick, id) {
     var coords = this.genRandomCoords();
     this.gameState.players.push({
       id: id,
+      nick: nick,
       blocks: [coords],
       sLength: 1,
       immunity: 0,
@@ -57,7 +58,7 @@ module.exports = class SnakeActions {
     // Get array of objects with players' lengths and id
     var players = this.gameState.players.map(p => {
       return {
-        id: p.id,
+        nick: p.nick,
         score: p.sLength,
         color: p.color
       };

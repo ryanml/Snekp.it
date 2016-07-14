@@ -137,7 +137,7 @@ window.onload = function() {
             // Draw the nickname under the head
             if (b === players[p].blocks.length - 1) {
               this.context.fillStyle = '#000000';
-              this.context.fillText(players[p].id, calc(blocks[0][0] - this.viewportX[0]) - 20, calc(blocks[0][1] - this.viewportY[0]) + 35);
+              this.context.fillText(players[p].nick, calc(blocks[0][0] - this.viewportX[0]) - 20, calc(blocks[0][1] - this.viewportY[0]) + 35);
             }
             this.context.strokeStyle = '#d3d3d3';
           }
@@ -163,8 +163,7 @@ window.onload = function() {
       var x = this.canvas.width - 155, y = 70, yInc = 30;
       for (var l = 0; l < leaders.length; l++) {
         var pos = l + 1;
-        this.context.fillStyle = leaders[l].color;
-        var leadString = pos + '. ' + leaders[l].id;
+        var leadString = pos + '. ' + leaders[l].nick;
         this.context.fillText(leadString, x, y);
         y += yInc;
       }
@@ -226,7 +225,8 @@ window.onload = function() {
       location.reload();
     }
   }
-  var score,
+  var nick,
+      score,
       clientId,
       gameHandler,
       headPosition;
@@ -245,23 +245,31 @@ window.onload = function() {
   canvas.width = width;
   canvas.height = height;
   // Get player's client id
-  socket.on('client-id', function(id) {
+  socket.on('request-nick', function(id) {
     if (!clientId) {
       clientId = id;
-      gameHandler = new GameHandler(clientId);
+      while (!nick) {
+        nick = prompt("Enter a nickname: ");
+      }
+      socket.emit('receive-nick', nick);
     }
+  });
+  socket.on('received-nick', function() {
+    gameHandler = new GameHandler(clientId);
   });
   // Action on state change
   socket.on('state-change', function(newState) {
-    gameHandler.setCellDimensions();
-    gameHandler.updateGameState(newState);
-    if (gameHandler.checkLife()) {
-      score = gameHandler.getScore();
-      gameHandler.calculateViewport();
-    } else {
-      console.log(gameHandler.replayDiv);
-      gameHandler.replayDiv.style.display = 'block';
+    if (gameHandler) {
+      gameHandler.setCellDimensions();
+      gameHandler.updateGameState(newState);
+      if (gameHandler.checkLife()) {
+        score = gameHandler.getScore();
+        gameHandler.calculateViewport();
+      } else {
+        console.log(gameHandler.replayDiv);
+        gameHandler.replayDiv.style.display = 'block';
+      }
+      gameHandler.drawState();
     }
-    gameHandler.drawState();
   });
 }
