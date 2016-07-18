@@ -3,6 +3,7 @@
   <head>
     <title>Snake</title>
     <meta charset="utf-8"></meta>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="../socket.io/socket.io.js"></script>
     <script src="../js/client.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/style.css">
@@ -11,9 +12,11 @@
     </div>
     <div id="game-wrapper">
       <canvas id="game-canvas"></canvas>
-      <div id="replay-div" class="prompt-div">
-        <h4>Shucks. You done died.</h4>
-        <button id="replay" type="button">Replay</button>
+      <div id="join-div" class="prompt-div">
+        <h2>Snekp.it</h2>
+        <strong id="death-title">You died :(</strong>
+        <input type="text" id="user-nick"/>
+        <button id="join" type="button">Join</button>
       </div>
     </div>
   </body>

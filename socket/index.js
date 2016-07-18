@@ -11,9 +11,9 @@ exports.socket = function(http) {
     // id associate with client connection
     var id = socket.id;
     // Send id to the client and request the nickname
-    io.emit('request-nick', id);
+    io.emit('id', id);
     // Add new player on connection, send the client id
-    socket.on('receive-nick', function(nick) {
+    socket.on('nick', function(nick) {
       snake.addPlayer(nick, id);
       io.emit('received-nick');
     });

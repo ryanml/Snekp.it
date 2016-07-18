@@ -14,8 +14,10 @@ window.onload = function() {
   var body = document.body;
   var canvas = document.getElementById('game-canvas');
   var context = canvas.getContext('2d');
-  var replayDiv = document.getElementById('replay-div');
-  var replayButton = document.getElementById('replay');
+  var joinDiv = document.getElementById('join-div');
+  var deathTitle = document.getElementById('death-title');
+  var joinButton = document.getElementById('join');
+  var nickField = document.getElementById('user-nick');
   // Create image elements
   var foodImage = document.createElement('img');
   foodImage.src = '/img/food.png';
@@ -33,18 +35,14 @@ window.onload = function() {
   };
   // Socket actions
   // Get player's client id
-  socket.on('request-nick', function(id) {
+  socket.on('id', function(id) {
     if (!playerId) {
       playerId = id;
-      while (!playerNick) {
-        playerNick = prompt("Enter a nickname: ");
-      }
-      // Send nickname
-      socket.emit('receive-nick', playerNick);
     }
   });
   socket.on('received-nick', function() {
     isPlay = true;
+    joinDiv.style.display = 'none';
   });
   // Accept state change from socket
   socket.on('state-change', function(newState) {
@@ -123,7 +121,7 @@ window.onload = function() {
         }
       }
     }
-    if (y < gW) {
+    if (y < gH) {
       for (var fx = ((gW / 2) * -1); fx < gW; fx++) {
         for (var i = 1; i < (gW / 2); i++) {
           context.strokeRect(calc((x - vX) + fx), calc((y - (y + i)) - vY), blockSize, blockSize);
@@ -232,6 +230,15 @@ window.onload = function() {
     }
     drawStatBoxes();
   };
+  // Sends nickname to socket
+  const sendNick = (e) => {
+    var nick = nickField.value;
+    if (!nick) {
+      alert('You must enter a nickname.');
+      return false;
+    }
+    socket.emit('nick', nick);
+  };
   // Sends key action to the socket
   const sendAction = (e) => {
       var key = e.keyCode;
@@ -263,13 +270,10 @@ window.onload = function() {
     }
     // Shows reload box
   const promptDeath = () => {
-    replayDiv.style.display = 'block';
-  };
-  // Reloads page
-  const reloadPage = () => {
-    location.reload();
+    joinDiv.style.display = 'block';
+    deathTitle.style.display = 'block';
   };
   // Add events
   body.addEventListener('keydown', sendAction);
-  replayButton.addEventListener('click', reloadPage);
+  joinButton.addEventListener('click', sendNick);
 }

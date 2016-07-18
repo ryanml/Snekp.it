@@ -15,8 +15,8 @@ body {
 #game-canvas {
   float:left;
 }
-.prompt-div {
-  display:none;
+#join-div {
+  display:block;
   position:fixed;
   padding:10px;
   text-align:center;
@@ -30,13 +30,6 @@ body {
   border:1px solid #000000;
   border-radius:5px;
 }
-#replay-div h4 {
-  color:#ff3333;
-}
-#replay {
-  padding:5px;
-  border-radius:5px;
-  border:1px solid #006600;
-  background:#00cc00;
-  color:#ffffff;
+#death-title {
+  display:none;
 }
