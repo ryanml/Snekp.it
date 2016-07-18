@@ -4,7 +4,7 @@
   "description": "A snake game that supports many players.",
   "main": "app.js",
   "engines": {
-    "node": "4.1.1"
+    "node": "6.2.1"
   },
   "dependencies": {
     "express": "^4.10.2",
