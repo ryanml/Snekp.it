@@ -2,8 +2,12 @@
   "name": "multiplayer-snake",
   "version": "0.0.1",
   "description": "A snake game that supports many players.",
+  "main": "app.js",
   "dependencies": {
     "express": "^4.10.2",
     "socket.io": "^1.4.8"
+  },
+  "scripts": {
+    "start": "node app.js"
   }
 }
