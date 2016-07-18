@@ -110,28 +110,28 @@ window.onload = function() {
     if (x < gS) {
       for (var fy = ((gH / 2) * -1); fy < gH; fy++) {
         for (var i = 0; i < (gW / 2); i++) {
-          context.strokeRect(calc((x - ((x + 1) + i)) - vX), calc((y - vY) + fy), blockSize, blockSize);
+          context.fillRect(calc((x - ((x + 1) + i)) - vX), calc((y - vY) + fy), blockSize, blockSize);
         }
       }
     }
     if ((gS - x) < gW) {
       for (var fy = ((gH / 2) * -1); fy < gH; fy++) {
         for (var i = 0; i < (gW / 2); i++) {
-          context.strokeRect(calc(((gS - x) + (gW / 2)) + i), calc((y - vY) + fy), blockSize, blockSize);
+          context.fillRect(calc(((gS - x) + (gW / 2)) + i), calc((y - vY) + fy), blockSize, blockSize);
         }
       }
     }
     if (y < gH) {
       for (var fx = ((gW / 2) * -1); fx < gW; fx++) {
         for (var i = 1; i < (gW / 2); i++) {
-          context.strokeRect(calc((x - vX) + fx), calc((y - (y + i)) - vY), blockSize, blockSize);
+          context.fillRect(calc((x - vX) + fx), calc((y - (y + i)) - vY), blockSize, blockSize);
         }
       }
     }
     if ((gS - y) < gH) {
       for (var fx = ((gW / 2) * -1); fx < gW; fx++) {
         for (var i = 0; i < (gW / 2); i++) {
-          context.strokeRect(calc((x - vX) + fx), calc(((gS - y) + (gH / 2)) + i), blockSize, blockSize);
+          context.fillRect(calc((x - vX) + fx), calc(((gS - y) + (gH / 2)) + i), blockSize, blockSize);
         }
       }
     }

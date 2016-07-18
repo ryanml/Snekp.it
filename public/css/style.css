@@ -1,5 +1,6 @@
 /* style.css */
 body {
+  background:url('/img/back.jpg');
   margin:0px !important;
   text-align:center;
   font-family:"Open Sans";
