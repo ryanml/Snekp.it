@@ -3,7 +3,7 @@ window.onload = function() {
   // Need variables
   var gameState;
   var socket = io();
-  var gridSize = 200;
+  var gridSize = 100;
   var blockSize = 20;
   var isPlay = false;
   var viewportX, viewportY;
