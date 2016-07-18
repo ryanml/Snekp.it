@@ -10,7 +10,7 @@ module.exports = class SnakeActions {
         numPlayers: 0
       }
     // gridSize
-    this.gridSize = 300;
+    this.gridSize = 200;
     // When a player picks up a shield, they will be immune for 133 state changes.
     // This is about 10 seconds. This can be stacked with multiple shields.
     this.immuneTime = 133;
@@ -18,10 +18,10 @@ module.exports = class SnakeActions {
   addItems() {
     // There must be at least 1000 pieces of food in play at a time
     var foods = this.gameState.foodCoords;
-    var neededFood = 0, required = 700;
+    var neededFood = 0, required = 450;
     // There must be at least 40 shields in play at a time
     var shields = this.gameState.shieldCoords;
-    var neededShields = 0, requiredShields = 25;
+    var neededShields = 0, requiredShields = 20;
     if (foods.length < required) {
       neededFood = (required - foods.length);
     }
