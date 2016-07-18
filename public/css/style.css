@@ -6,30 +6,31 @@ body {
   font-family:"Open Sans";
   color:#404040;
 }
-#game-wrapper {
-  text-align:center;
-  width:100%;
-  height:100%;
-  margin-left:auto;
-  margin-right:auto;
-}
 #game-canvas {
   float:left;
 }
 #join-div {
   display:block;
-  position:fixed;
-  padding:10px;
-  text-align:center;
-  width:20%;
-  top:30%;
-  left:50%;
-  margin-top:-50px;
-  margin-left:-100px;
+  position:absolute;
+  height:25%;
+  width:30%;
+  top:0;
+  bottom:40%;
+  left:0;
+  right:0;
+  margin:auto;
   opacity:0.8;
   background:#d3d3d3;
   border:1px solid #000000;
   border-radius:5px;
+  text-align:center;
+  padding:10px;
+  overflow:none;
+}
+#user-nick {
+  width:80%;
+  display:inline-block !important;
+  margin:10px 0px;
 }
 #death-title {
   display:none;

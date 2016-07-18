@@ -16,12 +16,12 @@ module.exports = class SnakeActions {
     this.immuneTime = 133;
   }
   addItems() {
-    // There must be at least 1000 pieces of food in play at a time
+    // There must be at least 50 pieces of food in play at a time
     var foods = this.gameState.foodCoords;
-    var neededFood = 0, required = 175;
-    // There must be at least 40 shields in play at a time
+    var neededFood = 0, required = 50;
+    // There must be at least 3 shields in play at a time
     var shields = this.gameState.shieldCoords;
-    var neededShields = 0, requiredShields = 8;
+    var neededShields = 0, requiredShields = 3;
     if (foods.length < required) {
       neededFood = (required - foods.length);
     }
@@ -79,7 +79,7 @@ module.exports = class SnakeActions {
     // If the player was killed, add food in their wake
     if (deathObj.kill) {
       // For every other block, add food at that coordinate
-      for (var b = 1; b < deadPlayer.blocks.length; b += 2) {
+      for (var b = 1; b < deadPlayer.blocks.length; b += 4) {
         var block = deadPlayer.blocks[b];
         this.gameState.foodCoords.push({
           coords: [block[0], block[1]],

@@ -15,7 +15,7 @@ window.onload = function() {
   var canvas = document.getElementById('game-canvas');
   var context = canvas.getContext('2d');
   var joinDiv = document.getElementById('join-div');
-  var deathTitle = document.getElementById('death-title');
+  var joinTitle = document.getElementById('join-message');
   var joinButton = document.getElementById('join');
   var nickField = document.getElementById('user-nick');
   // Create image elements
@@ -28,6 +28,9 @@ window.onload = function() {
   // Set canvas width
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+  // Canvas attributes
+  canvas.setAttribute("tabindex", 0);
+  joinTitle.innerHTML = 'Snekp.it';
   // Add listener to readjust width and height on resize
   window.onresize = () => {
     canvas.width = window.innerWidth;
@@ -106,10 +109,11 @@ window.onload = function() {
     var x = playerHeadX, y = playerHeadY;
     var vX = viewportX[0], vY = viewportY[0];
     var gW = widthInCells, gH = heightInCells;
-    context.fillStyle = '#d3d3d3';
+    context.strokeStyle = '#aaaaaa';
     if (x < gS) {
       for (var fy = ((gH / 2) * -1); fy < gH; fy++) {
         for (var i = 0; i < (gW / 2); i++) {
+          context.strokeRect(calc((x - ((x + 1) + i)) - vX), calc((y - vY) + fy), blockSize, blockSize);
           context.fillRect(calc((x - ((x + 1) + i)) - vX), calc((y - vY) + fy), blockSize, blockSize);
         }
       }
@@ -117,6 +121,7 @@ window.onload = function() {
     if ((gS - x) < gW) {
       for (var fy = ((gH / 2) * -1); fy < gH; fy++) {
         for (var i = 0; i < (gW / 2); i++) {
+          context.strokeRect(calc(((gS - x) + (gW / 2)) + i), calc((y - vY) + fy), blockSize, blockSize);
           context.fillRect(calc(((gS - x) + (gW / 2)) + i), calc((y - vY) + fy), blockSize, blockSize);
         }
       }
@@ -124,6 +129,7 @@ window.onload = function() {
     if (y < gH) {
       for (var fx = ((gW / 2) * -1); fx < gW; fx++) {
         for (var i = 1; i < (gW / 2); i++) {
+          context.strokeRect(calc((x - vX) + fx), calc((y - (y + i)) - vY), blockSize, blockSize);
           context.fillRect(calc((x - vX) + fx), calc((y - (y + i)) - vY), blockSize, blockSize);
         }
       }
@@ -131,10 +137,12 @@ window.onload = function() {
     if ((gS - y) < gH) {
       for (var fx = ((gW / 2) * -1); fx < gW; fx++) {
         for (var i = 0; i < (gW / 2); i++) {
+          context.strokeRect(calc((x - vX) + fx), calc(((gS - y) + (gH / 2)) + i), blockSize, blockSize);
           context.fillRect(calc((x - vX) + fx), calc(((gS - y) + (gH / 2)) + i), blockSize, blockSize);
         }
       }
     }
+    context.strokeStyle = '#d3d3d3';
     context.fillStyle = '#ffffff';
   };
   // Checks if given coordinate is within viewport bounds
@@ -270,8 +278,8 @@ window.onload = function() {
     }
     // Shows reload box
   const promptDeath = () => {
+    joinTitle.innerHTML = 'You died :(';
     joinDiv.style.display = 'block';
-    deathTitle.style.display = 'block';
   };
   // Add events
   body.addEventListener('keydown', sendAction);
