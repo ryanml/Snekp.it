@@ -181,6 +181,9 @@ window.onload = function() {
     for (var l = 0; l < leaders.length; l++) {
       var pos = l + 1;
       var pNick = leaders[l].nick
+      if (pNick.length > 10) {
+        pNick = pNick.slice(0, 7) + '...';
+      }
       var leadString = pos + '. ' + pNick;
       context.fillText(leadString, x, y);
       y += yInc;

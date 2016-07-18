@@ -20,4 +20,6 @@ app.get('/', function(req, res) {
 socket.socket(http);
 
 // Set server to listen designated port
-http.listen(process.env.PORT || app.get('port'));
+http.listen(app.get('port'), '0.0.0.0', function(foo) {
+  console.log('listening on port 3000');
+});
