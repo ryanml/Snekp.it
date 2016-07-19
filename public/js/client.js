@@ -10,6 +10,8 @@ window.onload = function() {
   var playerHeadX, playerHeadY;
   var widthInCells, heightInCells;
   var playerId, playerNick, playerScore, playerDir;
+  // Check if user is a mobile device or tablet
+  var isMobile = navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/);
   // Needed dom elements
   var body = document.body;
   var canvas = document.getElementById('game-canvas');
@@ -32,10 +34,10 @@ window.onload = function() {
   canvas.setAttribute("tabindex", 0);
   joinTitle.innerHTML = 'Snekp.it';
   // Add listener to readjust width and height on resize
-  window.onresize = () => {
+  window.onresize = function() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-  };
+  }
   // Socket actions
   // Get player's client id
   socket.on('id', function(id) {
@@ -52,7 +54,7 @@ window.onload = function() {
     handleStateChange(newState);
   });
   // Calls appropriate functions to handle state change
-  const handleStateChange = (newState) => {
+  function handleStateChange(newState) {
     if (isPlay) {
       gameState = newState;
       setCellDimensions();
@@ -63,9 +65,9 @@ window.onload = function() {
       }
       drawState();
     }
-  };
+  }
   // Sets the grid width and height in cells given the size
-  const setCellDimensions = () => {
+  function setCellDimensions() {
     var width = 0, height = 0;
     for (var w = 0; w < canvas.width; w += blockSize) {
       width++;
@@ -75,10 +77,12 @@ window.onload = function() {
     }
     widthInCells = width;
     heightInCells = height;
-  };
+  }
   // Sets player attributes, checks if player is alive.
-  const setPlayerAtts = () => {
-    var player = gameState.players.filter(p => p.id === playerId);
+  function setPlayerAtts() {
+    var player = gameState.players.filter(function(p) {
+      return p.id === playerId;
+    });
     if (player.length === 0) {
       return false;
     }
@@ -86,19 +90,19 @@ window.onload = function() {
     playerScore = player[0].sLength;
     playerHeadX = player[0].blocks[0][0], playerHeadY = player[0].blocks[0][1];
     return true;
-  };
+  }
   // Calculates the viewport to display
-  const calculateViewport = () => {
+  function calculateViewport() {
     // Get offset from end of the grid for both x and y
     viewportX = [playerHeadX - (widthInCells / 2), (playerHeadX + widthInCells)];
     viewportY = [playerHeadY - (heightInCells / 2), (playerHeadY + heightInCells)];
-  };
+  }
   // Quick function to multiply by blocksize
-  const calc = (num) => {
+  function calc(num) {
     return num * blockSize;
-  };
+  }
   // Draws bound areas around the grid
-  const drawBounds = () => {
+  function drawBounds() {
     var gS = gridSize;
     var x = playerHeadX, y = playerHeadY;
     var vX = viewportX[0], vY = viewportY[0];
@@ -138,24 +142,24 @@ window.onload = function() {
     }
     context.strokeStyle = '#d3d3d3';
     context.fillStyle = '#ffffff';
-  };
+  }
   // Checks if given coordinate is within viewport bounds
-  const checkViewBounds = (coords) => {
+  function checkViewBounds(coords) {
     if ((coords[0] >= viewportX[0] && coords[0] <= viewportX[1]) && (coords[1] >= viewportY[0] && coords[1] <= viewportY[1])) {
       return true;
     } else {
       return false;
     }
-  };
+  }
   // Draws player nick under head
-  const drawPlayerNick = (nick, headX, headY) => {
+  function drawPlayerNick(nick, headX, headY) {
     // Draw the nickname under the head
     context.fillStyle = '#000000';
     context.fillText(nick, calc(headX - viewportX[0]) - 20, calc(headY - viewportY[0]) + 35);
     context.strokeStyle = '#d3d3d3';
-  };
+  }
   // Draw stat boxes
-  const drawStatBoxes = () => {
+  function drawStatBoxes() {
     // Set box attributes
     context.globalAlpha = 0.8;
     context.fillStyle = '#5A5A5A';
@@ -169,9 +173,7 @@ window.onload = function() {
     context.fillText('Leaderboard', canvas.width - 170, 30);
     // Draw leaders
     var leaders = gameState.leaders;
-    var x = canvas.width - 175,
-      y = 70,
-      yInc = 30;
+    var x = canvas.width - 175, y = 70, yInc = 30;
     for (var l = 0; l < leaders.length; l++) {
       var pos = l + 1;
       var pNick = leaders[l].nick
@@ -192,9 +194,9 @@ window.onload = function() {
     // Reset opacity and fillstyle
     context.globalAlpha = 1.0;
     context.fillStyle = '#d3d3d3';
-  };
+  }
   // Draws all objects and players in the current state
-  const drawState = () => {
+  function drawState() {
     // Clear canvas
     context.clearRect(0, 0, canvas.width, canvas.height);
     // Call function to draw bound lines
@@ -234,18 +236,18 @@ window.onload = function() {
       drawPlayerNick(players[p].nick, blocks[0][0], blocks[0][1]);
     }
     drawStatBoxes();
-  };
+  }
   // Sends nickname to socket
-  const sendNick = (e) => {
+  function sendNick() {
     var nick = nickField.value;
     if (!nick) {
       alert('You must enter a nickname.');
       return false;
     }
     socket.emit('nick', nick);
-  };
+  }
   // Sends key action to the socket
-  const sendAction = (e) => {
+  function sendAction(e) {
       var key = e.keyCode, action = false;
       playerDir = playerDir || false;
       switch (key) {
@@ -273,12 +275,12 @@ window.onload = function() {
       if (action) {
         socket.emit('player-movement', action);
       }
-    }
+  }
     // Shows reload box
-  const promptDeath = () => {
+  function promptDeath() {
     joinTitle.innerHTML = 'You died :(';
     joinDiv.style.display = 'block';
-  };
+  }
   // Add events
   body.addEventListener('keydown', sendAction);
   joinButton.addEventListener('click', sendNick);
