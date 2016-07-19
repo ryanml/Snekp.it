@@ -16,12 +16,12 @@ module.exports = class SnakeActions {
     this.immuneTime = 133;
   }
   addItems() {
-    // There must be at least 50 pieces of food in play at a time
+    // There must be at least 70 pieces of food in play at a time
     var foods = this.gameState.foodCoords;
-    var neededFood = 0, required = 50;
-    // There must be at least 3 shields in play at a time
+    var neededFood = 0, required = 70;
+    // There must be at least 2 shields in play at a time
     var shields = this.gameState.shieldCoords;
-    var neededShields = 0, requiredShields = 3;
+    var neededShields = 0, requiredShields = 2;
     if (foods.length < required) {
       neededFood = (required - foods.length);
     }

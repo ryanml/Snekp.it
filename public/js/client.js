@@ -9,7 +9,7 @@ window.onload = function() {
   var viewportX, viewportY;
   var playerHeadX, playerHeadY;
   var widthInCells, heightInCells;
-  var playerId, playerNick, playerScore, playerAction;
+  var playerId, playerNick, playerScore, playerDir;
   // Needed dom elements
   var body = document.body;
   var canvas = document.getElementById('game-canvas');
@@ -56,9 +56,7 @@ window.onload = function() {
     if (isPlay) {
       gameState = newState;
       setCellDimensions();
-      if (checkLife()) {
-        setPlayerScore();
-        setPlayerPos();
+      if (setPlayerAtts()) {
         calculateViewport();
       } else {
         promptDeath();
@@ -78,20 +76,16 @@ window.onload = function() {
     widthInCells = width;
     heightInCells = height;
   };
-  // Checks if player is alive
-  const checkLife = () => {
+  // Sets player attributes, checks if player is alive.
+  const setPlayerAtts = () => {
     var player = gameState.players.filter(p => p.id === playerId);
-    return player.length === 0 ? false : true;
-  };
-    // Sets the player score
-  const setPlayerScore = () => {
-    var player = gameState.players.filter(p => p.id === playerId);
+    if (player.length === 0) {
+      return false;
+    }
+    playerDir = player[0].direction;
     playerScore = player[0].sLength;
-  };
-  // Sets the player position
-  const setPlayerPos = () => {
-    var player = gameState.players.filter(p => p.id === playerId)[0];
-    playerHeadX = player.blocks[0][0], playerHeadY = player.blocks[0][1];
+    playerHeadX = player[0].blocks[0][0], playerHeadY = player[0].blocks[0][1];
+    return true;
   };
   // Calculates the viewport to display
   const calculateViewport = () => {
@@ -128,7 +122,7 @@ window.onload = function() {
     }
     if (y < gH) {
       for (var fx = ((gW / 2) * -1); fx < gW; fx++) {
-        for (var i = 1; i < (gW / 2); i++) {
+        for (var i = 1; i <= (gH / 2); i++) {
           context.strokeRect(calc((x - vX) + fx), calc((y - (y + i)) - vY), blockSize, blockSize);
           context.fillRect(calc((x - vX) + fx), calc((y - (y + i)) - vY), blockSize, blockSize);
         }
@@ -136,7 +130,7 @@ window.onload = function() {
     }
     if ((gS - y) < gH) {
       for (var fx = ((gW / 2) * -1); fx < gW; fx++) {
-        for (var i = 0; i < (gW / 2); i++) {
+        for (var i = 0; i <= (gH / 2); i++) {
           context.strokeRect(calc((x - vX) + fx), calc(((gS - y) + (gH / 2)) + i), blockSize, blockSize);
           context.fillRect(calc((x - vX) + fx), calc(((gS - y) + (gH / 2)) + i), blockSize, blockSize);
         }
@@ -252,31 +246,32 @@ window.onload = function() {
   };
   // Sends key action to the socket
   const sendAction = (e) => {
-      var key = e.keyCode;
+      var key = e.keyCode, action = false;
+      playerDir = playerDir || false;
       switch (key) {
         case 37:
-          if (playerAction !== 'RIGHT' || playerScore === 1) {
-            playerAction = 'LEFT';
+          if (playerDir !== 'RIGHT' || playerScore === 1) {
+            action = 'LEFT';
           }
           break;
         case 38:
-          if (playerAction !== 'DOWN' || playerScore === 1) {
-            playerAction = 'UP';
+          if (playerDir !== 'DOWN' || playerScore === 1) {
+            action = 'UP';
           }
           break;
         case 39:
-          if (playerAction !== 'LEFT' || playerScore === 1) {
-            playerAction = 'RIGHT';
+          if (playerDir !== 'LEFT' || playerScore === 1) {
+            action = 'RIGHT';
           }
           break;
         case 40:
-          if (playerAction !== 'UP' || playerScore === 1) {
-            playerAction = 'DOWN';
+          if (playerDir !== 'UP' || playerScore === 1) {
+            action = 'DOWN';
           }
           break;
       }
-      if (playerAction) {
-        socket.emit('player-movement', playerAction);
+      if (action) {
+        socket.emit('player-movement', action);
       }
     }
     // Shows reload box
