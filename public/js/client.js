@@ -6,12 +6,14 @@ window.onload = function() {
   var gridSize = 100;
   var blockSize = 20;
   var isPlay = false;
+  var recvNick = false;
   var viewportX, viewportY;
   var playerHeadX, playerHeadY;
   var widthInCells, heightInCells;
+  var userAgent = navigator.userAgent;
   var playerId, playerNick, playerScore, playerDir;
   // Check if user is a mobile device or tablet
-  var isMobile = navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/);
+  var mobileUsr = userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/);
   // Needed dom elements
   var body = document.body;
   var canvas = document.getElementById('game-canvas');
@@ -46,7 +48,10 @@ window.onload = function() {
     }
   });
   socket.on('received-nick', function() {
-    isPlay = true;
+    if (!recvNick){
+      isPlay = true;
+      recvNick = true;
+    }
     joinDiv.style.display = 'none';
   });
   // Accept state change from socket
@@ -107,11 +112,9 @@ window.onload = function() {
     var x = playerHeadX, y = playerHeadY;
     var vX = viewportX[0], vY = viewportY[0];
     var gW = widthInCells, gH = heightInCells;
-    context.strokeStyle = '#aaaaaa';
     if (x < gS) {
       for (var fy = ((gH / 2) * -1); fy < gH; fy++) {
         for (var i = 0; i < (gW / 2); i++) {
-          context.strokeRect(calc((x - ((x + 1) + i)) - vX), calc((y - vY) + fy), blockSize, blockSize);
           context.fillRect(calc((x - ((x + 1) + i)) - vX), calc((y - vY) + fy), blockSize, blockSize);
         }
       }
@@ -119,7 +122,6 @@ window.onload = function() {
     if ((gS - x) < gW) {
       for (var fy = ((gH / 2) * -1); fy < gH; fy++) {
         for (var i = 0; i < (gW / 2); i++) {
-          context.strokeRect(calc(((gS - x) + (gW / 2)) + i), calc((y - vY) + fy), blockSize, blockSize);
           context.fillRect(calc(((gS - x) + (gW / 2)) + i), calc((y - vY) + fy), blockSize, blockSize);
         }
       }
@@ -127,7 +129,6 @@ window.onload = function() {
     if (y < gH) {
       for (var fx = ((gW / 2) * -1); fx < gW; fx++) {
         for (var i = 1; i <= (gH / 2); i++) {
-          context.strokeRect(calc((x - vX) + fx), calc((y - (y + i)) - vY), blockSize, blockSize);
           context.fillRect(calc((x - vX) + fx), calc((y - (y + i)) - vY), blockSize, blockSize);
         }
       }
@@ -135,12 +136,10 @@ window.onload = function() {
     if ((gS - y) < gH) {
       for (var fx = ((gW / 2) * -1); fx < gW; fx++) {
         for (var i = 0; i <= (gH / 2); i++) {
-          context.strokeRect(calc((x - vX) + fx), calc(((gS - y) + (gH / 2)) + i), blockSize, blockSize);
           context.fillRect(calc((x - vX) + fx), calc(((gS - y) + (gH / 2)) + i), blockSize, blockSize);
         }
       }
     }
-    context.strokeStyle = '#d3d3d3';
     context.fillStyle = '#ffffff';
   }
   // Checks if given coordinate is within viewport bounds
@@ -248,8 +247,13 @@ window.onload = function() {
   }
   // Sends key action to the socket
   function sendAction(e) {
-      var key = e.keyCode, action = false;
+      var key, action = false;
       playerDir = playerDir || false;
+      if (e.type === 'click') {
+        key = parseInt(this.id);
+      } else {
+        key = e.keyCode;
+      }
       switch (key) {
         case 37:
           if (playerDir !== 'RIGHT' || playerScore === 1) {
@@ -276,12 +280,64 @@ window.onload = function() {
         socket.emit('player-movement', action);
       }
   }
-    // Shows reload box
+  // Shows reload box
   function promptDeath() {
     joinTitle.innerHTML = 'You died :(';
     joinDiv.style.display = 'block';
   }
+  function addMobileInterface() {
+    var width = screen.width;
+    var halfWidth = Math.floor(width / 2);
+    var height = screen.height;
+    var halfHeight = Math.floor(height / 2);
+    var offset = (blockSize * 3);
+    var sideTop = Math.floor(height / 2.5);
+    var sideHeight = Math.floor(height / 7);
+    // Create invisible divs that will act as touch areas for direction
+    var upArrow = document.createElement('div');
+    upArrow.id = "38";
+    upArrow.className = "dir-area";
+    upArrow.style.top = "0";
+    upArrow.style.left = "0";
+    upArrow.style.width = width + "px";
+    upArrow.style.height = (halfHeight - offset) + "px";
+    var downArrow = document.createElement('div');
+    downArrow.id = "40";
+    downArrow.className = "dir-area";
+    downArrow.style.top = halfHeight + "px";
+    downArrow.style.left = "0";
+    downArrow.style.width = width + "px";
+    downArrow.style.height = halfHeight + "px";
+    var leftArrow = document.createElement('div');
+    leftArrow.id = "37";
+    leftArrow.className = "dir-area";
+    leftArrow.style.top = sideTop + "px";
+    leftArrow.style.left = "0";
+    leftArrow.style.width = (halfWidth) + "px";
+    leftArrow.style.height = sideHeight + "px";
+    var rightArrow = document.createElement('div');
+    rightArrow.id = "39";
+    rightArrow.className = "dir-area";
+    rightArrow.style.top = sideTop + "px";
+    rightArrow.style.right = "0";
+    rightArrow.style.width = (halfWidth - (blockSize * 2)) + "px";
+    rightArrow.style.height = sideHeight + "px";
+    // Add to body
+    body.appendChild(upArrow);
+    body.appendChild(downArrow);
+    body.appendChild(leftArrow);
+    body.appendChild(rightArrow);
+    // Add event listener to each areas
+    var dirAreas = document.getElementsByClassName('dir-area');
+    for (var d = 0; d < dirAreas.length; d++) {
+      dirAreas[d].addEventListener('click', sendAction);
+    }
+  }
   // Add events
   body.addEventListener('keydown', sendAction);
   joinButton.addEventListener('click', sendNick);
+  // Add mobile interface if needed
+  if (mobileUsr) {
+    addMobileInterface();
+  }
 }

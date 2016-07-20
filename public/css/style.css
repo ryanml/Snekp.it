@@ -35,3 +35,14 @@ body {
 #death-title {
   display:none;
 }
+/* Mobile direction arrows */
+.dir-area {
+  position:absolute;
+}
+@media only screen and (max-width: 500px) {
+  #join-div {
+    z-index:100;
+    width:40%;
+    height:40%;
+  }
+}

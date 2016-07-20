@@ -1,14 +1,13 @@
 'use strict';
 module.exports = class SnakeActions {
   constructor() {
-    // Game state object contains players, coordinates of food, and the number of players as attributes.
+    // Game state object contains players, coordinates of food and shields as attributes.
     this.gameState = {
         players: [],
         leaders: [],
         foodCoords: [],
         shieldCoords: [],
-        numPlayers: 0
-      }
+    }
     // gridSize
     this.gridSize = 100;
     // When a player picks up a shield, they will be immune for 133 state changes.
@@ -19,9 +18,9 @@ module.exports = class SnakeActions {
     // There must be at least 70 pieces of food in play at a time
     var foods = this.gameState.foodCoords;
     var neededFood = 0, required = 70;
-    // There must be at least 2 shields in play at a time
+    // There must be at least 1 shield in play at a time
     var shields = this.gameState.shieldCoords;
-    var neededShields = 0, requiredShields = 2;
+    var neededShields = 0, requiredShields = 1;
     if (foods.length < required) {
       neededFood = (required - foods.length);
     }
@@ -52,7 +51,6 @@ module.exports = class SnakeActions {
       direction: false,
       color: this.genRandomColor()
     });
-    this.gameState.numPlayers = this.gameState.players.length;
   }
   calcLeaders() {
     // Get array of objects with players' lengths and id
@@ -75,7 +73,6 @@ module.exports = class SnakeActions {
     var players = this.gameState.players;
     var deadPlayer = players.filter(p => p.id === deathObj.id)[0];
     this.gameState.players = players.filter(p => p.id !== deathObj.id);
-    this.gameState.numPlayers = this.gameState.players.length;
     // If the player was killed, add food in their wake
     if (deathObj.kill) {
       // For every other block, add food at that coordinate

@@ -21,7 +21,7 @@ exports.socket = function(http) {
     if (updateLoop) {
       clearInterval(updateLoop);
     }
-    // Every 100ms, update player coordinates and push state change to client
+    // Every 75ms, update player coordinates and push state change to client
     updateLoop = setInterval(function() {
       snake.updatePositions();
       io.emit('state-change', snake.gameState);
