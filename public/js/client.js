@@ -23,8 +23,12 @@ window.onload = function() {
   var joinButton = document.getElementById('join');
   var nickField = document.getElementById('user-nick');
   // Create image elements
-  var foodImage = document.createElement('img');
-  foodImage.src = '/img/food.png';
+  var burgImage = document.createElement('img');
+  burgImage.src = '/img/burger.png';
+  var sushiImage = document.createElement('img');
+  sushiImage.src = '/img/sushi.gif';
+  var cakeImage = document.createElement('img');
+  cakeImage.src = '/img/cake.png';
   var shieldImage = document.createElement('img');
   shieldImage.src = '/img/shield.png';
   var immuneImage = document.createElement('img');
@@ -160,19 +164,23 @@ window.onload = function() {
   // Draw stat boxes
   function drawStatBoxes() {
     // Set box attributes
+    var boardWidth = mobileUsr ? 140 : 190;
+    var boardHeight = mobileUsr ? 210 : 260;
+    var boardFontSize = mobileUsr ? '15' : '20';
+    var playerX = mobileUsr ? 125 : 175;
     context.globalAlpha = 0.8;
     context.fillStyle = '#5A5A5A';
-    context.font = '20px monospace';
+    context.font = boardFontSize + 'px monospace';
     // Draw leaderboard box
-    context.fillRect(canvas.width - 190, 10, 180, 260);
+    context.fillRect(canvas.width - boardWidth, 10, (boardWidth - 10), boardHeight);
     // Draw stats box
     context.fillRect(10, canvas.height - 50, 285, 30);
     // Draw placeholder leaderboard
     context.fillStyle = '#ffffff';
-    context.fillText('Leaderboard', canvas.width - 170, 30);
+    context.fillText('Leaderboard', canvas.width - (boardWidth - 20), 30);
     // Draw leaders
     var leaders = gameState.leaders;
-    var x = canvas.width - 175, y = 70, yInc = 30;
+    var x = canvas.width - playerX, y = 70, yInc = 30;
     for (var l = 0; l < leaders.length; l++) {
       var pos = l + 1;
       var pNick = leaders[l].nick
@@ -205,7 +213,19 @@ window.onload = function() {
     for (var f = 0; f < foodCoords.length; f++) {
       var coords = foodCoords[f].coords;
       if (checkViewBounds(coords)) {
-        context.drawImage(foodImage, calc(coords[0] - viewportX[0]), calc(coords[1] - viewportY[0]));
+        var fImg, type = foodCoords[f].foodType;
+        switch(type) {
+          case 'burger':
+            fImg = burgImage;
+            break;
+          case 'sushi':
+            fImg = sushiImage;
+            break;
+          case 'cake':
+            fImg = cakeImage;
+            break;
+        }
+        context.drawImage(fImg, calc(coords[0] - viewportX[0]), calc(coords[1] - viewportY[0]));
       }
     }
     // Draw shields
@@ -294,39 +314,39 @@ window.onload = function() {
     var sideTop = Math.floor(height / 2.5);
     var sideHeight = Math.floor(height / 7);
     // Create invisible divs that will act as touch areas for direction
-    var upArrow = document.createElement('div');
-    upArrow.id = "38";
-    upArrow.className = "dir-area";
-    upArrow.style.top = "0";
-    upArrow.style.left = "0";
-    upArrow.style.width = width + "px";
-    upArrow.style.height = (halfHeight - offset) + "px";
-    var downArrow = document.createElement('div');
-    downArrow.id = "40";
-    downArrow.className = "dir-area";
-    downArrow.style.top = halfHeight + "px";
-    downArrow.style.left = "0";
-    downArrow.style.width = width + "px";
-    downArrow.style.height = halfHeight + "px";
-    var leftArrow = document.createElement('div');
-    leftArrow.id = "37";
-    leftArrow.className = "dir-area";
-    leftArrow.style.top = sideTop + "px";
-    leftArrow.style.left = "0";
-    leftArrow.style.width = (halfWidth) + "px";
-    leftArrow.style.height = sideHeight + "px";
-    var rightArrow = document.createElement('div');
-    rightArrow.id = "39";
-    rightArrow.className = "dir-area";
-    rightArrow.style.top = sideTop + "px";
-    rightArrow.style.right = "0";
-    rightArrow.style.width = (halfWidth - (blockSize * 2)) + "px";
-    rightArrow.style.height = sideHeight + "px";
+    var upArea = document.createElement('div');
+    upArea.id = "38";
+    upArea.className = "dir-area";
+    upArea.style.top = "0";
+    upArea.style.left = "0";
+    upArea.style.width = width + "px";
+    upArea.style.height = (halfHeight - offset) + "px";
+    var downArea = document.createElement('div');
+    downArea.id = "40";
+    downArea.className = "dir-area";
+    downArea.style.top = halfHeight + "px";
+    downArea.style.left = "0";
+    downArea.style.width = width + "px";
+    downArea.style.height = halfHeight + "px";
+    var leftArea = document.createElement('div');
+    leftArea.id = "37";
+    leftArea.className = "dir-area";
+    leftArea.style.top = sideTop + "px";
+    leftArea.style.left = "0";
+    leftArea.style.width = (halfWidth) + "px";
+    leftArea.style.height = sideHeight + "px";
+    var rightArea = document.createElement('div');
+    rightArea.id = "39";
+    rightArea.className = "dir-area";
+    rightArea.style.top = sideTop + "px";
+    rightArea.style.right = "0";
+    rightArea.style.width = (halfWidth - (blockSize * 2)) + "px";
+    rightArea.style.height = sideHeight + "px";
     // Add to body
-    body.appendChild(upArrow);
-    body.appendChild(downArrow);
-    body.appendChild(leftArrow);
-    body.appendChild(rightArrow);
+    body.appendChild(upArea);
+    body.appendChild(downArea);
+    body.appendChild(leftArea);
+    body.appendChild(rightArea);
     // Add event listener to each areas
     var dirAreas = document.getElementsByClassName('dir-area');
     for (var d = 0; d < dirAreas.length; d++) {

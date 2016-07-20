@@ -28,8 +28,10 @@ module.exports = class SnakeActions {
       neededShields = (requiredShields - shields.length);
     }
     for (var f = 0; f < neededFood; f++) {
+      var type = this.genRandomFoodType();
       var coords = this.genRandomCoords();
       this.gameState.foodCoords.push({
+        foodType: type,
         coords: coords
       });
     }
@@ -75,10 +77,12 @@ module.exports = class SnakeActions {
     this.gameState.players = players.filter(p => p.id !== deathObj.id);
     // If the player was killed, add food in their wake
     if (deathObj.kill) {
-      // For every other block, add food at that coordinate
+      // For every fourth block, add food at that coordinate
       for (var b = 1; b < deadPlayer.blocks.length; b += 4) {
         var block = deadPlayer.blocks[b];
+        var type = this.genRandomFoodType();
         this.gameState.foodCoords.push({
+          foodType: type,
           coords: [block[0], block[1]],
         });
       }
@@ -123,6 +127,21 @@ module.exports = class SnakeActions {
       }
     }
     return [x, y];
+  }
+  genRandomFoodType() {
+    var type, choice = Math.floor(Math.random() * 3);
+    switch (choice) {
+      case 0:
+        type = 'burger';
+        break;
+      case 1:
+        type = 'sushi';
+        break;
+      case 2:
+        type = 'cake';
+        break;
+    }
+    return type;
   }
   genRandomColor() {
     var chars = 'ABCDEF0123456789';
