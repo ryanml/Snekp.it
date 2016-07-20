@@ -148,7 +148,9 @@ window.onload = function() {
   }
   // Checks if given coordinate is within viewport bounds
   function checkViewBounds(coords) {
-    if ((coords[0] >= viewportX[0] && coords[0] <= viewportX[1]) && (coords[1] >= viewportY[0] && coords[1] <= viewportY[1])) {
+    var vX = viewportX, vY = viewportY;
+    if ((coords[0] >= vX[0] && coords[0] <= vX[1]) &&
+        (coords[1] >= vY[0] && coords[1] <= vY[1])) {
       return true;
     } else {
       return false;
@@ -214,6 +216,8 @@ window.onload = function() {
       var coords = foodCoords[f].coords;
       if (checkViewBounds(coords)) {
         var fImg, type = foodCoords[f].foodType;
+        var fx = calc(coords[0] - viewportX[0]);
+        var fy = calc(coords[1] - viewportY[0]);
         switch(type) {
           case 'burger':
             fImg = burgImage;
@@ -225,15 +229,17 @@ window.onload = function() {
             fImg = cakeImage;
             break;
         }
-        context.drawImage(fImg, calc(coords[0] - viewportX[0]), calc(coords[1] - viewportY[0]));
+        context.drawImage(fImg, fx, fy);
       }
     }
     // Draw shields
     var shieldCoords = gameState.shieldCoords;
     for (var s = 0; s < shieldCoords.length; s++) {
       var coords = shieldCoords[s].coords;
+      var sx = calc(coords[0] - viewportX[0]);
+      var sy = calc(coords[1] - viewportY[0]);
       if (checkViewBounds(coords)) {
-        context.drawImage(shieldImage, calc(coords[0] - viewportX[0]), calc(coords[1] - viewportY[0]));
+        context.drawImage(shieldImage, sx, sy);
       }
     }
     // Draw player blocks
@@ -242,13 +248,15 @@ window.onload = function() {
       for (var b = 0; b < players[p].blocks.length; b++) {
         var blocks = players[p].blocks;
         if (checkViewBounds(blocks[b])) {
+          var bx = calc(blocks[b][0] - viewportX[0]);
+          var by = calc(blocks[b][1] - viewportY[0]);
           context.fillStyle = players[p].color;
-          context.strokeRect(calc(blocks[b][0] - viewportX[0]), calc(blocks[b][1] - viewportY[0]), blockSize, blockSize);
+          context.strokeRect(bx, by, blockSize, blockSize);
           // If the player is immune, use the rainbow immune image for the blocks
           if (players[p].immunity > 0) {
-            context.drawImage(immuneImage, calc(blocks[b][0] - viewportX[0]), calc(blocks[b][1] - viewportY[0]));
+            context.drawImage(immuneImage, bx, by);
           } else {
-            context.fillRect(calc(blocks[b][0] - viewportX[0]), calc(blocks[b][1] - viewportY[0]), blockSize, blockSize);
+            context.fillRect(bx, by, blockSize, blockSize);
           }
         }
       }
