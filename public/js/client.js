@@ -6,7 +6,6 @@ window.onload = function() {
   var gridSize = 100;
   var blockSize = 20;
   var isPlay = false;
-  var recvNick = false;
   var viewportX, viewportY;
   var playerHeadX, playerHeadY;
   var widthInCells, heightInCells;
@@ -51,12 +50,10 @@ window.onload = function() {
       playerId = id;
     }
   });
-  socket.on('received-nick', function() {
-    if (!recvNick){
-      isPlay = true;
-      recvNick = true;
+  socket.on('received-nick', function(id) {
+    if (playerId === id) {
+      joinDiv.style.display = 'none';
     }
-    joinDiv.style.display = 'none';
   });
   // Accept state change from socket
   socket.on('state-change', function(newState) {
@@ -271,7 +268,8 @@ window.onload = function() {
       alert('You must enter a nickname.');
       return false;
     }
-    socket.emit('nick', nick);
+    socket.emit('nick', nick, playerId);
+    isPlay = true;
   }
   // Sends key action to the socket
   function sendAction(e) {

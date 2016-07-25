@@ -13,9 +13,9 @@ exports.socket = function(http) {
     // Send id to the client and request the nickname
     io.emit('id', id);
     // Add new player on connection, send the client id
-    socket.on('nick', function(nick) {
+    socket.on('nick', function(nick, playerId) {
       snake.addPlayer(nick, id);
-      io.emit('received-nick');
+      io.emit('received-nick', playerId);
     });
     // To avoid double interval, clear loop on reload
     if (updateLoop) {
@@ -37,6 +37,5 @@ exports.socket = function(http) {
         kill: false
       });
     })
-
   });
 }
