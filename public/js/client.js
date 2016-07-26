@@ -264,9 +264,8 @@ window.onload = function() {
   // Sends nickname to socket
   function sendNick() {
     var nick = nickField.value;
-    if (!nick) {
-      alert('You must enter a nickname.');
-      return false;
+    if (!nick || (nick.trim() == "")) {
+      nick = "Guest" + Math.floor(Math.random() * 10000000);
     }
     socket.emit('nick', nick, playerId);
     isPlay = true;
