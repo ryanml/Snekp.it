@@ -12,7 +12,10 @@ You have a small world on a 100x100 grid. Starting off as a single block, you'll
 ![sushi](https://github.com/ryanml/Snekp.it/blob/master/public/img/sushi.gif "sushi")
 
 ### Survival
-In order to keep alive, you'll need to avoid the grayed-out out of bounds areas. If your snake's head (first block segment) touches any part of another player, or any part of your body, that's it. Pick up a shield ![shield](https://github.com/ryanml/Snekp.it/blob/master/public/img/shield.png "shield") and you'll be colorfully immune from curling into yourself and crashing in to other players for about 10 seconds. You still won't be able to go out of bounds though.
+In order to keep alive, you'll need to avoid the grayed-out out of bounds areas. If your snake's head (first block segment) touches any part of another player, or any part of your body, that's it. If two snake heads collide, both snakes die. Pick up a shield ![shield](https://github.com/ryanml/Snekp.it/blob/master/public/img/shield.png "shield") and you'll be colorfully immune from curling into yourself and crashing in to other players for about 10 seconds. You still won't be able to go out of bounds though.
+
+### Competition
+If you cut off another player, that is get their head to hit your body, you will receive 10 points. When a player dies in any way besides a disconnection, every fourth segment will turn in to food. So it is in your best interest to take out as many snakes as possible ;)
 
 ### Set it up locally
 Snekpit uses Node.js on the server side and is dependent on Express.js and Socket.io to make the magic happen.
