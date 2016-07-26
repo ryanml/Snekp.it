@@ -93,7 +93,7 @@ window.onload = function() {
       return false;
     }
     playerDir = player[0].direction;
-    playerScore = player[0].sLength;
+    playerScore = player[0].score;
     playerHeadX = player[0].blocks[0][0], playerHeadY = player[0].blocks[0][1];
     return true;
   }
@@ -129,14 +129,14 @@ window.onload = function() {
     }
     if (y < gH) {
       for (var fx = ((gW / 2) * -1); fx < gW; fx++) {
-        for (var i = 1; i <= (gH / 2); i++) {
+        for (var i = 1; i <= (gW / 2); i++) {
           context.fillRect(calc((x - vX) + fx), calc((y - (y + i)) - vY), blockSize, blockSize);
         }
       }
     }
     if ((gS - y) < gH) {
       for (var fx = ((gW / 2) * -1); fx < gW; fx++) {
-        for (var i = 0; i <= (gH / 2); i++) {
+        for (var i = 0; i <= (gW / 2); i++) {
           context.fillRect(calc((x - vX) + fx), calc(((gS - y) + (gH / 2)) + i), blockSize, blockSize);
         }
       }
@@ -153,11 +153,11 @@ window.onload = function() {
       return false;
     }
   }
-  // Draws player nick under head
-  function drawPlayerNick(nick, headX, headY) {
-    // Draw the nickname under the head
+  // Draws player nick and score under the head
+  function drawPlayerNick(player, headX, headY) {
+    var info = player.nick + ' [' + player.score + ']';
     context.fillStyle = '#000000';
-    context.fillText(nick, calc(headX - viewportX[0]) - 20, calc(headY - viewportY[0]) + 35);
+    context.fillText(info, calc(headX - viewportX[0]) - 20, calc(headY - viewportY[0]) + 35);
     context.strokeStyle = '#d3d3d3';
   }
   // Draw stat boxes
@@ -257,7 +257,7 @@ window.onload = function() {
           }
         }
       }
-      drawPlayerNick(players[p].nick, blocks[0][0], blocks[0][1]);
+      drawPlayerNick(players[p], blocks[0][0], blocks[0][1]);
     }
     drawStatBoxes();
   }

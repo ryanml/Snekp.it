@@ -48,7 +48,7 @@ module.exports = class SnakeActions {
       id: id,
       nick: nick,
       blocks: [coords],
-      sLength: 1,
+      score: 1,
       immunity: 0,
       direction: false,
       color: this.genRandomColor()
@@ -59,7 +59,7 @@ module.exports = class SnakeActions {
     var players = this.gameState.players.map(p => {
       return {
         nick: p.nick,
-        score: p.sLength,
+        score: p.score,
         color: p.color
       };
     });
@@ -227,7 +227,7 @@ module.exports = class SnakeActions {
             for (var o = 0; o < players[l].blocks.length; o++) {
               if (x === players[l].blocks[o][0] && y === players[l].blocks[o][1]) {
                 // Add 10 to the other players score
-                players[l].sLength += 10;
+                players[l].score += 10;
                 // Push the colliding player to the casualties list
                 casualties.push({
                   id: p.id,
@@ -278,12 +278,12 @@ module.exports = class SnakeActions {
       if (selfConsumed) {
         // Add new block
         var tail = [x, y];
-        // If our length is 1, push a block to the array so we have something to pop off
-        if (p.sLength === 1) {
+        // If the player score is 1, push a block to the array so we have something to pop off
+        if (p.score === 1) {
           p.blocks.push([p.blocks[0][0], p.blocks[0][1]]);
         }
-        // Increment sLength
-        p.sLength++;
+        // Increment score
+        p.score++;
       } else {
         var tail = p.blocks.pop();
         tail[0] = x;
