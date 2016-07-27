@@ -129,14 +129,14 @@ window.onload = function() {
     }
     if (y < gH) {
       for (var fx = ((gW / 2) * -1); fx < gW; fx++) {
-        for (var i = 1; i <= (gW / 2); i++) {
+        for (var i = 1; i <= (gH / 2) + 1; i++) {
           context.fillRect(calc((x - vX) + fx), calc((y - (y + i)) - vY), blockSize, blockSize);
         }
       }
     }
     if ((gS - y) < gH) {
       for (var fx = ((gW / 2) * -1); fx < gW; fx++) {
-        for (var i = 0; i <= (gW / 2); i++) {
+        for (var i = 0; i <= (gH / 2); i++) {
           context.fillRect(calc((x - vX) + fx), calc(((gS - y) + (gH / 2)) + i), blockSize, blockSize);
         }
       }

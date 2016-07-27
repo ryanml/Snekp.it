@@ -12,7 +12,7 @@ body {
 #join-div {
   display:block;
   position:absolute;
-  height:25%;
+  height:30%;
   width:30%;
   top:0;
   bottom:40%;
@@ -27,19 +27,32 @@ body {
   padding:10px;
   overflow:none;
 }
+#git-link:hover {
+  text-decoration:none;
+}
 #user-nick {
   width:80%;
   display:inline-block !important;
-  margin:10px 0px;
+  margin:10px 10px;
 }
 #death-title {
   display:none;
 }
-/* Mobile direction arrows */
+/* Responsive/mobile CSS */
 .dir-area {
   position:absolute;
 }
-@media only screen and (max-width: 500px) {
+@media only screen and (min-height: 800px) {
+  #join-div {
+    height:20%;
+  }
+}
+@media only screen and (max-width: 970px) {
+  #join-div {
+    height:35%;
+  }
+}
+@media only screen and (max-width: 600px) {
   #join-div {
     z-index:100;
     width:40%;
